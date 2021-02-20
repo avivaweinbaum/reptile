@@ -1,4 +1,4 @@
-/* Ocamlyacc parser for Reptile!!!!!!! */
+/* Ocamlyacc parser for Reptile */
 /* Inspo from SSOL (2017), Crayon (2017), and MicroC */
 /* Aviva Weinbaum, Lindsey Weiskopf, Hariti Patel, Aileen Cano */
 
