@@ -44,3 +44,5 @@ type stmt =
     locals : bind list;
     body : stmt list;
   }
+
+  type program = bind list * func_decl list
