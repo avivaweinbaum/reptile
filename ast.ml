@@ -7,8 +7,9 @@ type operator = Add | Sub | Mul | Div | Equal | Neq | Less | Greater | Geq |
 type unoperator = Not | Neg
 type incoperator = Incr | Decr
 
-type typ = Int | Bool | Float | Void | String | Rgb | Canvas | Pointer | 
-          File | Array of typ * int
+type typ = Int | Bool | Float | Void | String | Rgb of bind list | 
+          Canvas of bind list | Pointer of bind list | 
+          File of bind list | Array of typ * int
 
 type bind = typ * string
 
@@ -36,6 +37,7 @@ type stmt =
   | While of expr * stmt
 
   type func_decl = {
+    (* do we need function keyword here? *)
     typ : typ;
     fname : string;
     formals : bind list;

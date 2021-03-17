@@ -48,6 +48,7 @@ rule token = parse
 | "Canvas" { CANVAS }
 | "Pointer" { POINTER }
 | "File"   { FILE }
+| "function" { FUNCTION }
 | "RGB"    { RGB }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
