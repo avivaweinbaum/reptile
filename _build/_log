@@ -1,0 +1,12 @@
+### Starting build.
+# Target: reptile.ml.depends, tags: { extension:ml, file:reptile.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules reptile.ml > reptile.ml.depends # cached
+# Target: ast.ml.depends, tags: { extension:ml, file:ast.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules ast.ml > ast.ml.depends # cached
+# Target: codegen.ml.depends, tags: { extension:ml, file:codegen.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules codegen.ml > codegen.ml.depends
++ ocamlfind ocamldep -modules codegen.ml > codegen.ml.depends
+File "codegen.ml", line 76, characters 12-12:
+Error: Syntax error
+Command exited with code 2.
+# Compilation unsuccessful.
