@@ -49,7 +49,7 @@ TESTFILES = $(TESTS:%=test-%.rt) $(TESTS:%=test-%.out) \
 
 TARFILES = ast.ml sast.ml codegen.ml Makefile _tags reptile.ml parser.mly \
 	README scanner.mll semant.ml testall.sh \
-	printbig.c arcade-font.pbm font2c \
+	printbig.c \
 	Dockerfile \
 	$(TESTFILES:%=tests/%) 
 
