@@ -14,18 +14,26 @@ let translate (globals, functions) =
 
   (* Get types from the context *)
   let i32_t      = L.i32_type    context 
+  and i8_t       = L.i8_type     context
   in
 
  (* Return the LLVM type for a Reptile type *)
   let ltype_of_typ = function
       A.Int   -> i32_t
   in
-  (*
+
+  let printf_t : L.lltype = 
+      L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+  let printf_func : L.llvalue = 
+      L.declare_function "printf" printf_t the_module in
+
+(*
   let printbig_t : L.lltype =
       L.function_type i32_t [| i32_t |] in
   let printbig_func : L.llvalue =
       L.declare_function "printbig" printbig_t the_module in
-  *)
+*)
+
  (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -44,6 +52,19 @@ let translate (globals, functions) =
 
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
 
+    (* Construct code for an expression; return its value *)
+    let rec expr builder ((_, e) : sexpr) = match e with
+        SLiteral i  -> L.const_int i32_t i
+      | SCall ("print", [e]) | SCall ("printb", [e]) ->
+          L.build_call printf_func [| int_format_str ; (expr builder e) |]
+            "printf" builder 
+      | SCall ("printbig", [e]) ->
+	  L.build_call printbig_func [| (expr builder e) |] "printbig" builder
+      | SCall ("printf", [e]) -> 
+	  L.build_call printf_func [| float_format_str ; (expr builder e) |]
+	    "printf" builder
+    in
+
  (* LLVM insists each basic block end with exactly one "terminator"
        instruction that transfers control.  This function runs "instr builder"
        if the current block does not already have a terminator.  Used,
@@ -52,13 +73,6 @@ let translate (globals, functions) =
       match L.block_terminator (L.insertion_block builder) with
         Some _ -> ()
       | None -> ignore (instr builder) in
-
-  (* Construct code for an expression; return its value *)
-    let rec expr builder ((_, e) : sexpr) = match e with
-        SLiteral i  -> L.const_int i32_t i
-      | SCall ("print", [e]) | SCall ("printb", [e]) ->
-          L.build_call printf_func [| int_format_str ; (expr builder e) |]
-            "printf" builder in
 
    (* Build the code for the given statement; return the builder for
        the statement's successor (i.e., the next instruction will be built
