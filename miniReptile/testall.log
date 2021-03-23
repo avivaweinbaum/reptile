@@ -1,0 +1,12 @@
+/usr/bin/lli
+
+###### Testing test-helloworld
+./reptile.native tests/test-helloworld.rt > test-helloworld.ll
+./testall.sh: 1: eval: ./reptile.native: Permission denied
+###### FAILED
+
+###### Testing fail-helloworld
+./reptile.native < tests/fail-helloworld.rt 2> fail-helloworld.err >> testall.log
+diff -b fail-helloworld.err tests/fail-helloworld.err > fail-helloworld.diff
+FAILED fail-helloworld.err differs from tests/fail-helloworld.err
+###### FAILED
