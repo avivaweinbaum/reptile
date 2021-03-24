@@ -1,5 +1,0 @@
-1c1
-< ./testall.sh: 1: eval: ./reptile.native: Permission denied
----
-> Fatal error: exception Failure("type doesn't exist")
-\ No newline at end of file
