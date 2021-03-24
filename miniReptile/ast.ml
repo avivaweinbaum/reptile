@@ -8,6 +8,7 @@ type unoperator = Not | Neg
 type incoperator = Incr | Decr
 
 type typ = Int | String | Void | Bool
+
 type bind = typ * string
 
 type expr =
@@ -25,17 +26,17 @@ type stmt =
     Expr of expr
   | Block of stmt list
 
-  type func_decl = {
-    typ : typ;
-    fname : string;
-    formals : bind list;
-    body : stmt list;
-  }
+type func_decl = {
+  typ : typ;
+  fname : string;
+  formals : bind list;
+  body : stmt list;
+}
 
-  type program = bind list * func_decl list
+type program = bind list * func_decl list
 
 
-  (* Pretty-printing functions *)
+(* Pretty-printing functions *)
 
 let string_of_op = function
 Add -> "+"
@@ -56,7 +57,7 @@ Neg -> "-"
 | Not -> "!"
 
 let rec string_of_expr = function
-Literal(l) -> string_of_int l
+  Literal(l) -> string_of_int l
 | BoolLit(true) -> "true"
 | BoolLit(false) -> "false"
 | Id(s) -> s
@@ -74,7 +75,7 @@ Block(stmts) ->
 (* | Return(expr) -> "return " ^ string_of_expr expr ^ ";\n"; *)
 
 let string_of_typ = function
-Int -> "int"
+  Int -> "int"
 | Bool -> "bool"
 | Void -> "void"
 

@@ -11,17 +11,15 @@ open Ast
 %token TRUE FALSE
 %token EXP INCR DECR MOD
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
-%token FUNCTION
 %token INT STRING VOID BOOL
 %token <int> LITERAL
+%token <bool> BLIT
 %token <string> ID SLIT
 %token EOF
 
 %start program
 %type <Ast.program> program
 
-%nonassoc NOELSE
-%nonassoc ELSE
 %left OR
 %left AND
 %left EQ NEQ
@@ -64,20 +62,21 @@ typ:
   | BOOL { Bool }
 
 stmt_list:
-          { [] }
+    /* nothing */  { [] }
   | stmt_list stmt { $2 :: $1 }
 
 stmt:
     expr SEMI                               { Expr $1   }
-  | LBRACE stmt RBRACE                      { Block($2) }
+  | LBRACE stmt_list RBRACE                 { Block(List.rev $2) }
 
 expr:
     LITERAL          { Literal($1)            }
+  | BLIT             { BoolLit($1)            }
   | SLIT             { String($1)             }
   | ID               { Id($1) }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
-  | expr TIMES  expr { Binop($1, Mult,  $3)   }
+  | expr TIMES  expr { Binop($1, Mul,  $3)   }
   | expr DIVIDE expr { Binop($1, Div,   $3)   }
   | expr EQ     expr { Binop($1, Equal, $3)   }
   | expr NEQ    expr { Binop($1, Neq,   $3)   }
