@@ -23,8 +23,6 @@ rule token = parse
 | '/'      { DIVIDE }
 | '%'      { MOD }
 | '^'      { EXP }
-| "++"     { INCR }
-| "--"     { DECR }
 | "=="     { EQ }
 | "!="     { NEQ }
 | '<'      { LT }
@@ -35,9 +33,10 @@ rule token = parse
 | "||"     { OR }
 | "!"      { NOT }
 | "int"    { INT }
-| "String" { STRING }
-| "Void"   { VOID }
-| "Bool"   { BOOL }
+| "string" { STRING }
+| "void"   { VOID }
+| "bool"   { BOOL }
+| "return" { RETURN }
 | digits as lxm { LITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*     as lxm { ID(lxm) }
 | '"' ([^ '"']* as str) '"' { SLIT(str) }

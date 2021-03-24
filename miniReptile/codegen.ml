@@ -14,11 +14,15 @@ let translate (globals, functions) =
 
   (* Get types from the context *)
   let i32_t      = L.i32_type    context 
-  and i8_t       = L.i8_type     context in
+  and i8_t       = L.i8_type     context 
+  and i1_t       = L.i1_type     context 
+  and void_t     = L.void_type   context in
 
  (* Return the LLVM type for a Reptile type *)
   let ltype_of_typ = function
-      A.Int   -> i32_t in
+      A.Int   -> i32_t 
+    | A.Bool  -> i1_t
+    | A.Void  -> void_t in
 
   let printf_t : L.lltype = 
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
@@ -48,7 +52,9 @@ let translate (globals, functions) =
         SLiteral i  -> L.const_int i32_t i
       | SCall ("print", [e]) ->
       L.build_call printf_func [| int_format_str ; (expr builder e) |]
-        "printf" builder 
+        "printf" builder
+      (* | SCall (f, args) ->
+          let (fdef, fdecl) = StringMap.find f function_decls *)
     in
 
  (* LLVM insists each basic block end with exactly one "terminator"
@@ -66,14 +72,23 @@ let translate (globals, functions) =
 
     let rec stmt builder = function
         SBlock sl -> List.fold_left stmt builder sl
-      | SExpr e -> ignore(expr builder e); builder in 
+      | SExpr e -> ignore(expr builder e); builder 
+      | SReturn e -> ignore(match fdecl.styp with
+                              (* Special "return nothing" instr *)
+                              A.Void -> L.build_ret_void builder 
+                              (* Build return statement *)
+                            | _ -> L.build_ret (expr builder e) builder );
+                     builder
+    in 
+
 
     (* Build the code for each statement in the function *)
     let builder = stmt builder (SBlock fdecl.sbody) in
 
     (* Add a return if the last block falls off the end *)
     add_terminal builder (match fdecl.styp with
-        t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
+        A.Void -> L.build_ret_void
+      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
     in
 
   List.iter build_function_body functions;

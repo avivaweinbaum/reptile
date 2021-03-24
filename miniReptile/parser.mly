@@ -9,9 +9,10 @@ open Ast
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LSQUARE RSQUARE
 %token PLUS MINUS TIMES DIVIDE
 %token TRUE FALSE
-%token EXP INCR DECR MOD
+%token EXP MOD
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token INT STRING VOID BOOL
+%token RETURN
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID SLIT
@@ -26,7 +27,6 @@ open Ast
 %left LT GT LEQ GEQ
 %left PLUS MINUS
 %left TIMES DIVIDE MOD
-%right INCR DECR
 %left EXP
 %right NOT
 
@@ -67,12 +67,17 @@ stmt_list:
 
 stmt:
     expr SEMI                               { Expr $1   }
+  | RETURN expr_opt SEMI                    { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2) }
+
+expr_opt:
+          { Noexpr }
+  | expr  { $1 }
 
 expr:
     LITERAL          { Literal($1)            }
   | BLIT             { BoolLit($1)            }
-  | SLIT             { String($1)             }
+  // | SLIT             { String($1)             }
   | ID               { Id($1) }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
@@ -90,8 +95,6 @@ expr:
   | expr MOD    expr { Binop($1, Mod,   $3)   }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
-  | expr INCR        { Inc($1, Incr)         }
-  | expr DECR        { Inc($1, Decr)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
   | TRUE             { BoolLit(true) }

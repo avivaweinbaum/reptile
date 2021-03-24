@@ -5,7 +5,6 @@ type operator = Add | Sub | Mul | Div | Equal | Neq | Less | Greater | Geq | Leq
           And | Or | Exp | Mod
 
 type unoperator = Not | Neg
-type incoperator = Incr | Decr
 
 type typ = Int | String | Void | Bool
 
@@ -14,17 +13,16 @@ type bind = typ * string
 type expr =
     Binop of expr * operator * expr
   | Unop of unoperator * expr
-  | Inc of expr * incoperator
   | Literal of int
   | BoolLit of bool
   | Id of string
-  | String of string
   | Call of string * expr list
   | Noexpr
 
 type stmt = 
     Expr of expr
   | Block of stmt list
+  | Return of expr
 
 type func_decl = {
   typ : typ;
@@ -51,6 +49,8 @@ Add -> "+"
 | Geq -> ">="
 | And -> "&&"
 | Or -> "||"
+| Exp -> "^"
+| Mod -> "%"
 
 let string_of_uop = function
 Neg -> "-"
@@ -71,8 +71,8 @@ let rec string_of_expr = function
 let rec string_of_stmt = function
 Block(stmts) ->
   "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
-| Expr(expr) -> string_of_expr expr ^ ";\n"
-(* | Return(expr) -> "return " ^ string_of_expr expr ^ ";\n"; *)
+| Expr(expr) -> string_of_expr expr ^ ";\n";
+| Return(expr) -> "return " ^ string_of_expr expr ^ ";\n"
 
 let string_of_typ = function
   Int -> "int"

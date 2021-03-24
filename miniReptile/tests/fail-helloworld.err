@@ -1,1 +1,1 @@
-Fatal error: exception Failure("type doesn't exist")
+Fatal error: exception Failure("int_of_string")

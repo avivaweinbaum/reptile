@@ -7,7 +7,6 @@ type sexpr = typ * sx
 and sx =
     SBinop of sexpr * operator * sexpr
   | SUnop of unoperator * sexpr
-  | SInc of sexpr * incoperator
   | SLiteral of int
   | SBoolLit of bool
   | SId of string
@@ -18,6 +17,7 @@ and sx =
 type sstmt = 
     SExpr of sexpr
   | SBlock of sstmt list
+  | SReturn of sexpr
 
 type sfunc_decl = {
     styp : typ;
@@ -48,8 +48,8 @@ let rec string_of_sexpr (t, e) =
 let rec string_of_sstmt = function
     SBlock(stmts) ->
       "{\n" ^ String.concat "" (List.map string_of_sstmt stmts) ^ "}\n"
-  | SExpr(expr) -> string_of_sexpr expr ^ ";\n"
-  (* | SReturn(expr) -> "return " ^ string_of_sexpr expr ^ ";\n"; *)
+  | SExpr(expr) -> string_of_sexpr expr ^ ";\n";
+  | SReturn(expr) -> "return " ^ string_of_sexpr expr ^ ";\n"
 
 let string_of_sfdecl fdecl =
   string_of_typ fdecl.styp ^ " " ^
