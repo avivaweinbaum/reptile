@@ -1,0 +1,113 @@
+### Starting build.
+# Target: reptile.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:reptile.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules reptile.ml > reptile.ml.depends # cached
+# Target: ast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:ast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules ast.ml > ast.ml.depends # cached
+# Target: ast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml # cached
+# Target: codegen.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:codegen.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules codegen.ml > codegen.ml.depends # cached
+# Target: sast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:sast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules sast.ml > sast.ml.depends # cached
+# Target: sast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:sast.cmo, file:sast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmo sast.ml # cached
+# Target: codegen.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmo codegen.ml # cached
+# Target: parser.mly, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet, traverse }
+ocamlyacc parser.mly # cached
+# Target: parser.mli.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mli, file:parser.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules parser.mli > parser.mli.depends # cached
+# Target: parser.cmi, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o parser.cmi parser.mli # cached
+# Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet, traverse }
+ocamllex.opt -q scanner.mll # cached
+# Target: scanner.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:scanner.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules scanner.ml > scanner.ml.depends # cached
+# Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmo scanner.ml # cached
+# Target: semant.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:semant.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules semant.ml > semant.ml.depends
+# Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
+File "semant.ml", line 94, characters 26-2061:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Unop (_, _)|BoolLit _)
+File "semant.ml", line 106, characters 8-30:
+Warning 26: unused variable e.
+File "semant.ml", line 121, characters 8-33:
+Warning 26: unused variable call.
+File "semant.ml", line 144, characters 8-23:
+Warning 26: unused variable check_bool_expr.
+File "semant.ml", line 168, characters 18-20:
+Warning 27: unused variable ty.
+# Target: reptile.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:reptile.cmo, file:reptile.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o reptile.cmo reptile.ml
+# Target: ast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmx ast.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmx ast.ml
+File "ast.ml", line 66, characters 25-475:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(BoolLit _|Assign (_, _))
+File "ast.ml", line 80, characters 25-219:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Var (_, _)|VarAssign (_, _, _))
+File "ast.ml", line 86, characters 20-172:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+String
+# Target: sast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:sast.cmx, file:sast.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmx sast.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmx sast.ml
+File "sast.ml", line 41, characters 34-540:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SBoolLit _|SString _|SAssign (_, _))
+File "sast.ml", line 56, characters 26-238:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SVar (_, _)|SVarAssign (_, _, _))
+# Target: parser.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:parser.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules parser.ml > parser.ml.depends
+# Target: parser.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parser.cmx parser.ml
+# Target: codegen.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:codegen.cmx, file:codegen.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
+File "codegen.ml", line 28, characters 21-225:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+String
+File "codegen.ml", line 106, characters 51-3751:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SBoolLit _|SString _)
+File "codegen.ml", line 89, characters 8-24:
+Warning 26: unused variable float_format_str.
+File "codegen.ml", line 148, characters 10-11:
+Warning 11: this match case is unused.
+# Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmx scanner.ml
+# Target: semant.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
+File "semant.ml", line 94, characters 26-2061:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Unop (_, _)|BoolLit _)
+File "semant.ml", line 106, characters 8-30:
+Warning 26: unused variable e.
+File "semant.ml", line 121, characters 8-33:
+Warning 26: unused variable call.
+File "semant.ml", line 144, characters 8-23:
+Warning 26: unused variable check_bool_expr.
+File "semant.ml", line 168, characters 18-20:
+Warning 27: unused variable ty.
+# Target: reptile.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:reptile.cmx, file:reptile.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o reptile.cmx reptile.ml
+# Target: reptile.native, tags: { package(llvm), package(llvm.analysis), warn(+a-4), dont_link_with, extension:native, file:reptile.native, link, native, ocaml, program, quiet, traverse }
+ocamlfind ocamlopt -linkpkg -package llvm -package llvm.analysis ast.cmx sast.cmx codegen.cmx parser.cmx scanner.cmx semant.cmx reptile.cmx -o reptile.native
+# Compilation successful.

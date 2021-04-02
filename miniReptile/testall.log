@@ -1,0 +1,57 @@
+/usr/bin/lli
+
+###### Testing test-arithmetic
+./reptile.native tests/test-arithmetic.rt > test-arithmetic.ll
+llc -relocation-model=pic test-arithmetic.ll > test-arithmetic.s
+cc -o test-arithmetic.exe test-arithmetic.s
+./test-arithmetic.exe
+diff -b test-arithmetic.out tests/test-arithmetic.out > test-arithmetic.diff
+###### SUCCESS
+
+###### Testing test-assign
+./reptile.native tests/test-assign.rt > test-assign.ll
+Fatal error: exception Failure("undeclared identifier i")
+###### FAILED
+
+###### Testing test-float
+./reptile.native tests/test-float.rt > test-float.ll
+llc -relocation-model=pic test-float.ll > test-float.s
+cc -o test-float.exe test-float.s
+./test-float.exe
+diff -b test-float.out tests/test-float.out > test-float.diff
+###### SUCCESS
+
+###### Testing test-helloworld
+./reptile.native tests/test-helloworld.rt > test-helloworld.ll
+llc -relocation-model=pic test-helloworld.ll > test-helloworld.s
+cc -o test-helloworld.exe test-helloworld.s
+./test-helloworld.exe
+diff -b test-helloworld.out tests/test-helloworld.out > test-helloworld.diff
+###### SUCCESS
+
+###### Testing test-rgb
+./reptile.native tests/test-rgb.rt > test-rgb.ll
+llc -relocation-model=pic test-rgb.ll > test-rgb.s
+cc -o test-rgb.exe test-rgb.s
+/tmp/ccX2THPc.o: In function `main':
+Reptile:(.text+0x11): undefined reference to `Rgb'
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-void
+./reptile.native tests/test-void.rt > test-void.ll
+llc -relocation-model=pic test-void.ll > test-void.s
+cc -o test-void.exe test-void.s
+./test-void.exe
+diff -b test-void.out tests/test-void.out > test-void.diff
+###### SUCCESS
+
+###### Testing fail-float
+./reptile.native < tests/fail-float.rt 2> fail-float.err >> testall.log
+diff -b fail-float.err tests/fail-float.err > fail-float.diff
+###### SUCCESS
+
+###### Testing fail-helloworld
+./reptile.native < tests/fail-helloworld.rt 2> fail-helloworld.err >> testall.log
+diff -b fail-helloworld.err tests/fail-helloworld.err > fail-helloworld.diff
+###### SUCCESS

@@ -36,7 +36,7 @@ clean :
 # Building the tarball
 
 TESTS = \
-	helloworld float void rgb
+	helloworld float void assign arithmetic
 
 FAILS = \
 	helloworld float
