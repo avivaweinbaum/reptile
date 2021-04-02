@@ -36,10 +36,10 @@ clean :
 # Building the tarball
 
 TESTS = \
-	helloworld
+	helloworld float void rgb
 
 FAILS = \
-	helloworld
+	helloworld float
  # assign1 assign2 assign3 dead1 dead2 expr1 expr2 expr3 float1 float2 \
  # for1 for2 for3 for4 for5 func1 func2 func3 func4 func5 func6 func7 \
  # func8 func9 global1 global2 if1 if2 if3 nomain printbig printb print \

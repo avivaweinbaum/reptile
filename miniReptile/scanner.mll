@@ -22,7 +22,6 @@ rule token = parse
 | '*'      { TIMES }
 | '/'      { DIVIDE }
 | '%'      { MOD }
-| '^'      { EXP }
 | "=="     { EQ }
 | "!="     { NEQ }
 | '<'      { LT }
@@ -34,9 +33,16 @@ rule token = parse
 | "!"      { NOT }
 | "int"    { INT }
 | "string" { STRING }
+| "float"  { FLOAT }
 | "void"   { VOID }
 | "bool"   { BOOL }
+| "Rgb"    { RGB }
+| "Canvas" { CANVAS }
+(* | "List"   { LIST } *)
+| "Pointer" { POINTER }
+| "File"   { FILE }
 | "return" { RETURN }
+| digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
 | digits as lxm { LITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*     as lxm { ID(lxm) }
 | '"' ([^ '"']* as str) '"' { SLIT(str) }

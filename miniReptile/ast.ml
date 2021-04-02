@@ -2,11 +2,13 @@
 (* Aviva Weinbaum, Lindsey Weiskopf, Hariti Patel, Aileen Cano *)
 
 type operator = Add | Sub | Mul | Div | Equal | Neq | Less | Greater | Geq | Leq | 
-          And | Or | Exp | Mod
+          And | Or | Mod
 
 type unoperator = Not | Neg
 
-type typ = Int | String | Void | Bool
+type typ = Int | String | Void | Bool | Float | Rgb | Canvas | 
+    Pointer | File
+    (* | List of typ * int *)
 
 type bind = typ * string
 
@@ -14,9 +16,12 @@ type expr =
     Binop of expr * operator * expr
   | Unop of unoperator * expr
   | Literal of int
+  | Fliteral of string
   | BoolLit of bool
   | Id of string
   | Call of string * expr list
+  (* | ListAccess of string * expr
+  | ListLit of expr list *)
   | Noexpr
 
 type stmt = 
@@ -49,7 +54,6 @@ Add -> "+"
 | Geq -> ">="
 | And -> "&&"
 | Or -> "||"
-| Exp -> "^"
 | Mod -> "%"
 
 let string_of_uop = function
@@ -58,14 +62,16 @@ Neg -> "-"
 
 let rec string_of_expr = function
   Literal(l) -> string_of_int l
-| BoolLit(true) -> "true"
-| BoolLit(false) -> "false"
+| Fliteral(f) -> f
 | Id(s) -> s
 | Binop(e1, o, e2) ->
   string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
 | Unop(o, e) -> string_of_uop o ^ string_of_expr e
 | Call(f, el) ->
   f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+(* | ListAccess(arr, index) -> 
+  arr ^ "[" ^ string_of_expr index ^ "]"
+| ListLit(args) -> "[" ^ (List.map string_of_expr args) ^ "]" *)
 | Noexpr -> ""
 
 let rec string_of_stmt = function
@@ -78,6 +84,12 @@ let string_of_typ = function
   Int -> "int"
 | Bool -> "bool"
 | Void -> "void"
+| Float -> "float"
+| Rgb -> "Rgb"
+| Canvas -> "Canvas"
+| Pointer -> "Pointer"
+| File -> "File"
+(* | List -> "List" *)
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

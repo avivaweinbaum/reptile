@@ -9,9 +9,12 @@ and sx =
   | SUnop of unoperator * sexpr
   | SLiteral of int
   | SBoolLit of bool
+  | SFliteral of string
   | SId of string
   | SString of string
   | SCall of string * sexpr list
+  (* | SListAccess of string * sexpr
+  | SListLit of sexpr list *)
   | SNoexpr
 
 type sstmt = 
@@ -34,14 +37,16 @@ type sfunc_decl = {
 let rec string_of_sexpr (t, e) =
   "(" ^ string_of_typ t ^ " : " ^ (match e with
     SLiteral(l) -> string_of_int l
-  | SBoolLit(true) -> "true"
-  | SBoolLit(false) -> "false"
+  | SFliteral(f) -> f
   | SId(s) -> s
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
   | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
+  (* | SListAccess(arr, index) -> 
+    arr ^ "[" ^ string_of_sexpr index ^ "]"
+  | SListLit(args) -> "[" ^ (List.map string_of_sexpr args) ^ "]" *)
   | SNoexpr -> ""
 				  ) ^ ")"				     
 

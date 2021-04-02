@@ -12,9 +12,12 @@ Instructions to run program:
 
 need:
 - resolve warnings
-- other statements (if/else, for, while)
-- other types (float, lists)
-- built-in types
+- other statements (if/else, while)
 - tests for all of this ^^
 - integrate svg stuff
 - make the tortoise library
+
+Lindsey: assign
+Hariti: if/else
+Aviva: while
+Aileen: tests

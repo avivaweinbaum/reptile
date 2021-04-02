@@ -33,12 +33,16 @@ let check (globals, functions) =
 
   (* Collect function declarations for built-in functions: no bodies *)
   let built_in_decls = 
-    let add_bind map (name, ty) = StringMap.add name {
-      typ = Void;
+    let add_bind map (name, rety, tys) = StringMap.add name {
+      typ = rety;
       fname = name; 
-      formals = [(ty, "x")];
+      formals = tys;
       body = [] } map
-    in List.fold_left add_bind StringMap.empty [ ("print", Int) ]
+    in List.fold_left add_bind StringMap.empty [ ("print", Void, [(Int, "x")]);
+      ("Rgb", Rgb, [(Int, "r"); (Int, "g"); (Int, "b")]);
+      ("Pointer", Pointer, [(Float, "x"); (Float, "y"); (Rgb, "color"); (Float, "angle")]);
+      ("Canvas", Canvas, [(Float, "x"); (Float, "y")]);
+      ("File", File, [(String, "filename"); (Canvas, "canvas")]); ]
   in
 
   (* Add function name to symbol table *)
@@ -89,6 +93,7 @@ let check (globals, functions) =
     (* Return a semantically-checked expression, i.e., with a type *)
     let rec expr = function
         Literal  l -> (Int, SLiteral l)
+      | Fliteral f -> (Float, SFliteral f)
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       (* | Unop(op, e) as ex -> 
@@ -125,6 +130,9 @@ let check (globals, functions) =
           in 
           let args' = List.map2 check_call fd.formals args
           in (fd.typ, SCall(fname, args'))
+      (* | ListAccess(lst, idx)
+
+      | ListLit *)
     in
 
     let check_bool_expr e = 
@@ -138,8 +146,7 @@ let check (globals, functions) =
         Expr e -> SExpr (expr e)
       | Return e -> let (t, e') = expr e in
         if t = func.typ then SReturn (t, e') 
-        else raise (
-	  Failure ("return failure")) 
+        else raise (Failure ("return failure")) 
 	    
 	    (* A block is correct if each statement is correct and nothing
 	       follows any Return statement.  Nested blocks are flattened. *)
