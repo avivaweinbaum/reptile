@@ -22,6 +22,7 @@ type sstmt =
     SExpr of sexpr
   | SBlock of sstmt list
   | SReturn of sexpr
+  | SIf of sexpr * sstmt * sstmt
   | SVar of typ * string
   | SVarAssign of typ * string * sexpr
   | SWhile of sexpr * sstmt
@@ -63,6 +64,10 @@ let rec string_of_sstmt = function
   | SVarAssign(typ, var, ex) -> string_of_typ typ ^ " " ^ var ^ " = " ^ string_of_sexpr ex ^ "\n"
   | SReturn(expr) -> "return " ^ string_of_sexpr expr ^ ";\n"
   | SWhile(expr, stmt) -> "while (" ^ string_of_sexpr expr ^ ") " ^ string_of_sstmt stmt ^ "\n"
+  | SIf(e, s, SBlock([])) ->
+      "if (" ^ string_of_sexpr e ^ ")\n" ^ string_of_sstmt s
+  | SIf(e, s1, s2) ->  "if (" ^ string_of_sexpr e ^ ")\n" ^
+      string_of_sstmt s1 ^ "else\n" ^ string_of_sstmt s2
 
 let string_of_sfdecl fdecl =
   string_of_typ fdecl.styp ^ " " ^

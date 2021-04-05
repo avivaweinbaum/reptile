@@ -14,6 +14,7 @@ open Ast
 %token INT STRING VOID BOOL FLOAT
 %token RGB CANVAS POINTER FILE
 %token RETURN WHILE
+%token RETURN IF ELSE
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID SLIT FLIT
@@ -22,6 +23,8 @@ open Ast
 %start program
 %type <Ast.program> program
 
+%nonassoc NOELSE
+%nonassoc ELSE
 %left OR
 %left AND
 %left EQ NEQ
@@ -84,6 +87,8 @@ stmt:
     expr SEMI                               { Expr $1   }
   | RETURN expr_opt SEMI                    { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2) }
+  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
+  | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7)        }
   | vdecl_stmt                              { $1 }
   | WHILE LPAREN expr RPAREN stmt           { While($3, $5) }
 
