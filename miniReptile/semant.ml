@@ -75,6 +75,7 @@ let check (globals, functions) =
 
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
+    (* **********DIFFERENT************* *)
     let check_assign lvaluet rvaluet err =
        if lvaluet = rvaluet then lvaluet else raise (Failure err)
     in   
@@ -87,7 +88,7 @@ let check (globals, functions) =
     (* Return a variable from our local symbol table *)
     let type_of_identifier locals s =
       try StringMap.find s locals
-      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s ^ ))
     in
 
     (* Return a semantically-checked expression, i.e., with a type *)
@@ -143,7 +144,7 @@ let check (globals, functions) =
 
     let check_bool_expr locals e = 
       let (t', e') = expr locals e
-      and err = "expected Boolean expression"
+      and err = "expected Boolean expression in " ^ string_of_expr e
       in if t' != Bool then raise (Failure err) else (t', e') 
     in
 
@@ -165,17 +166,21 @@ let check (globals, functions) =
             | []              -> []
           in SBlock(check_stmt_list locals sl)
       | Var (ty,id) -> SVar(ty,id)
-      | VarAssign(ty,id,v) -> 
+      | VarAssign(_,s,e) -> 
+        let sx = expr locals e in
+        let ty = type_of_identifier locals s in 
+        SVarAssign(ty,s,sx)
+      (* | VarAssign(ty,id,v) -> 
         let v' = expr locals v in
         let id' = type_of_identifier locals id in 
-        SVarAssign(id',id,v')
+        SVarAssign(id',id,v') *)
 
     in (* body of check_function *)
     { styp = func.typ;
       sfname = func.fname;
       sformals = func.formals;
       sbody = match check_stmt symbols (Block func.body) with
-	SBlock(sl) -> sl
-      | _ -> raise (Failure ("internal error: block didn't become a block?"))
+        SBlock(sl) -> sl
+      | _ -> raise (Failure ("internal error: block didn't become a block"))
     }
   in (globals, List.map check_function functions)

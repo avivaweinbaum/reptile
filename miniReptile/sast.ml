@@ -57,6 +57,8 @@ let rec string_of_sstmt = function
     SBlock(stmts) ->
       "{\n" ^ String.concat "" (List.map string_of_sstmt stmts) ^ "}\n"
   | SExpr(expr) -> string_of_sexpr expr ^ ";\n";
+  | SVar(typ, var) -> string_of_typ typ ^ " " ^ var ^ "\n"
+  | SVarAssign(typ, var, ex) -> string_of_typ typ ^ " " ^ var ^ " = " ^ string_of_sexpr ex ^ "\n"
   | SReturn(expr) -> "return " ^ string_of_sexpr expr ^ ";\n"
 
 let string_of_sfdecl fdecl =

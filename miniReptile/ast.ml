@@ -59,6 +59,17 @@ Add -> "+"
 | Or -> "||"
 | Mod -> "%"
 
+let string_of_typ = function
+  Int -> "int"
+| Bool -> "bool"
+| Void -> "void"
+| Float -> "float"
+| Rgb -> "Rgb"
+| Canvas -> "Canvas"
+| Pointer -> "Pointer"
+| File -> "File"
+(* | List -> "List" *)
+
 let string_of_uop = function
 Neg -> "-"
 | Not -> "!"
@@ -81,18 +92,9 @@ let rec string_of_stmt = function
 Block(stmts) ->
   "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
 | Expr(expr) -> string_of_expr expr ^ ";\n";
+| Var(typ, var) -> string_of_typ typ ^ " " ^ var ^ "\n"
+| VarAssign(typ, var, ex) -> string_of_typ typ ^ " " ^ var ^ " = " ^ string_of_expr ex ^ "\n"
 | Return(expr) -> "return " ^ string_of_expr expr ^ ";\n"
-
-let string_of_typ = function
-  Int -> "int"
-| Bool -> "bool"
-| Void -> "void"
-| Float -> "float"
-| Rgb -> "Rgb"
-| Canvas -> "Canvas"
-| Pointer -> "Pointer"
-| File -> "File"
-(* | List -> "List" *)
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
