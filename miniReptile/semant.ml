@@ -88,7 +88,7 @@ let check (globals, functions) =
     (* Return a variable from our local symbol table *)
     let type_of_identifier locals s =
       try StringMap.find s locals
-      with Not_found -> raise (Failure ("undeclared identifier " ^ s ^ ))
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
     (* Return a semantically-checked expression, i.e., with a type *)
@@ -151,6 +151,7 @@ let check (globals, functions) =
     (* Return a semantically-checked statement i.e. containing sexprs *)
     let rec check_stmt locals = function
         Expr e -> SExpr (expr locals e)
+      | If(p, b1, b2) -> SIf(check_bool_expr locals p, check_stmt locals b1, check_stmt locals b2)
       | Return e -> let (t, e') = expr locals e in
         if t = func.typ then SReturn (t, e') 
         else raise (Failure ("return failure")) 

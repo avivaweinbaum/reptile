@@ -32,6 +32,8 @@ rule token = parse
 | "&&"     { AND }
 | "||"     { OR }
 | "!"      { NOT }
+| "if"     { IF }
+| "else"   { ELSE }
 | "int"    { INT }
 | "string" { STRING }
 | "float"  { FLOAT }

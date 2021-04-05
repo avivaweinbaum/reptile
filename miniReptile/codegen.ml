@@ -220,7 +220,18 @@ let translate (globals, functions) =
                               (* Build return statement *)
                             | _ -> L.build_ret (expr builder locals e) builder );
                      (builder,locals)
-                    
+      | SIf (predicate, then_stmt, else_stmt) ->
+      let bool_val = expr builder locals predicate in
+      let merge_bb = L.append_block context "merge" the_function in
+      let build_br_merge = L.build_br merge_bb in (* partial function *)
+      let then_bb = L.append_block context "then" the_function in
+        add_terminal (fst (stmt (L.builder_at_end context then_bb) locals then_stmt))
+          build_br_merge;
+      let else_bb = L.append_block context "else" the_function in
+        add_terminal (fst (stmt (L.builder_at_end context else_bb) locals else_stmt))
+          build_br_merge;
+      ignore(L.build_cond_br bool_val then_bb else_bb builder);
+      (L.builder_at_end context merge_bb, locals)               
     in 
 
 
