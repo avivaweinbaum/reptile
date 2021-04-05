@@ -42,6 +42,7 @@ rule token = parse
 (* | "List"   { LIST } *)
 | "Pointer" { POINTER }
 | "File"   { FILE }
+| "while"  { WHILE }
 | "return" { RETURN }
 | digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
 | digits as lxm { LITERAL(int_of_string lxm) }

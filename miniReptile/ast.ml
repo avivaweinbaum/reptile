@@ -31,6 +31,7 @@ type stmt =
   | Return of expr
   | Var of typ * string
   | VarAssign of typ * string * expr
+  | While of expr * stmt
 
 type func_decl = {
   typ : typ;
@@ -71,7 +72,7 @@ let string_of_typ = function
 (* | List -> "List" *)
 
 let string_of_uop = function
-Neg -> "-"
+  Neg -> "-"
 | Not -> "!"
 
 let rec string_of_expr = function
@@ -86,6 +87,7 @@ let rec string_of_expr = function
 (* | ListAccess(arr, index) -> 
   arr ^ "[" ^ string_of_expr index ^ "]"
 | ListLit(args) -> "[" ^ (List.map string_of_expr args) ^ "]" *)
+| Assign(v, e) -> v ^ " = " ^ string_of_expr e
 | Noexpr -> ""
 
 let rec string_of_stmt = function
@@ -95,6 +97,7 @@ Block(stmts) ->
 | Var(typ, var) -> string_of_typ typ ^ " " ^ var ^ "\n"
 | VarAssign(typ, var, ex) -> string_of_typ typ ^ " " ^ var ^ " = " ^ string_of_expr ex ^ "\n"
 | Return(expr) -> "return " ^ string_of_expr expr ^ ";\n"
+| While(expr, stmt) -> "while (" ^ string_of_expr expr ^ ") " ^ string_of_stmt stmt ^ "\n"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

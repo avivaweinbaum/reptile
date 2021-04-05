@@ -88,7 +88,7 @@ let check (globals, functions) =
     (* Return a variable from our local symbol table *)
     let type_of_identifier locals s =
       try StringMap.find s locals
-      with Not_found -> raise (Failure ("undeclared identifier " ^ s ^ ))
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
     (* Return a semantically-checked expression, i.e., with a type *)
@@ -158,24 +158,39 @@ let check (globals, functions) =
 	    (* A block is correct if each statement is correct and nothing
 	       follows any Return statement.  Nested blocks are flattened. *)
       | Block sl -> 
-          let rec check_stmt_list block_locals = function
+          let rec check_stmt_list block_locals ssl = function
               [Return _ as s] -> [check_stmt block_locals s]
             | Return _ :: _   -> raise (Failure "nothing may follow a return")
-            | Block sl :: ss  -> check_stmt_list block_locals (sl @ ss) (* Flatten blocks *)
-            | s :: ss         -> check_stmt locals s :: check_stmt_list block_locals ss
-            | []              -> []
-          in SBlock(check_stmt_list locals sl)
+            (* | Block sl :: ss  -> check_stmt_list block_locals (sl @ ss) Flatten blocks *)
+            | Block sl :: ss -> [check_stmt block_locals (Block sl)] 
+                              @ (check_stmt_list block_locals ssl ss)
+            | s :: ss ->
+              (match s with 
+                Var(t,name) -> 
+                  (match t with
+											Void -> raise(Failure ("illegal void local "^name))
+										| _ -> let block_locals = StringMap.add name t block_locals
+                           in [check_stmt block_locals s] @ check_stmt_list block_locals ssl ss)
+              | VarAssign(t,name,e) ->
+								if t == Void then raise(Failure ("illegal void local "^name) )
+								else
+                let sx = expr block_locals e in
+                let typ = (if fst(sx) == t
+                          then fst(sx) 
+                          else raise(Failure("illegal assignment"))) in
+                let block_locals = StringMap.add name typ block_locals in
+                  [check_stmt block_locals s] @ check_stmt_list block_locals ssl ss
+              | _ -> [check_stmt block_locals s] @ check_stmt_list block_locals ssl ss)
+            (* | s :: ss         -> check_stmt locals s :: check_stmt_list block_locals ss *)
+            | []              -> ssl
+          in SBlock(check_stmt_list locals [] sl)
       | Var (ty,id) -> SVar(ty,id)
       | VarAssign(_,s,e) -> 
         let sx = expr locals e in
         let ty = type_of_identifier locals s in 
         SVarAssign(ty,s,sx)
-      (* | VarAssign(ty,id,v) -> 
-        let v' = expr locals v in
-        let id' = type_of_identifier locals id in 
-        SVarAssign(id',id,v') *)
-
-    in (* body of check_function *)
+      | While(e, s) -> SWhile(check_bool_expr locals e, check_stmt locals s)
+      in
     { styp = func.typ;
       sfname = func.fname;
       sformals = func.formals;

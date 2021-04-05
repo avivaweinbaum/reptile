@@ -13,7 +13,7 @@ open Ast
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token INT STRING VOID BOOL FLOAT
 %token RGB CANVAS POINTER FILE
-%token RETURN
+%token RETURN WHILE
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID SLIT FLIT
@@ -85,6 +85,7 @@ stmt:
   | RETURN expr_opt SEMI                    { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2) }
   | vdecl_stmt                              { $1 }
+  | WHILE LPAREN expr RPAREN stmt           { While($3, $5) }
 
 expr_opt:
           { Noexpr }

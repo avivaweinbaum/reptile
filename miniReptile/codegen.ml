@@ -220,7 +220,17 @@ let translate (globals, functions) =
                               (* Build return statement *)
                             | _ -> L.build_ret (expr builder locals e) builder );
                      (builder,locals)
-                    
+      | SWhile (predicate, body) ->
+        let pred_bb = L.append_block context "while" the_function in
+        ignore(L.build_br pred_bb builder);
+        let body_bb = L.append_block context "while_body" the_function in
+        add_terminal (fst (stmt (L.builder_at_end context body_bb) locals body))
+        (L.build_br pred_bb);
+        let pred_builder = L.builder_at_end context pred_bb in
+        let bool_val = expr pred_builder locals predicate in
+        let merge_bb = L.append_block context "merge" the_function in
+        ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
+        (L.builder_at_end context merge_bb, locals)
     in 
 
 

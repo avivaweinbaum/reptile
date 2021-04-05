@@ -24,6 +24,7 @@ type sstmt =
   | SReturn of sexpr
   | SVar of typ * string
   | SVarAssign of typ * string * sexpr
+  | SWhile of sexpr * sstmt
 
 type sfunc_decl = {
     styp : typ;
@@ -50,6 +51,7 @@ let rec string_of_sexpr (t, e) =
   (* | SListAccess(arr, index) -> 
     arr ^ "[" ^ string_of_sexpr index ^ "]"
   | SListLit(args) -> "[" ^ (List.map string_of_sexpr args) ^ "]" *)
+  | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
   | SNoexpr -> ""
 				  ) ^ ")"				     
 
@@ -60,6 +62,7 @@ let rec string_of_sstmt = function
   | SVar(typ, var) -> string_of_typ typ ^ " " ^ var ^ "\n"
   | SVarAssign(typ, var, ex) -> string_of_typ typ ^ " " ^ var ^ " = " ^ string_of_sexpr ex ^ "\n"
   | SReturn(expr) -> "return " ^ string_of_sexpr expr ^ ";\n"
+  | SWhile(expr, stmt) -> "while (" ^ string_of_sexpr expr ^ ") " ^ string_of_sstmt stmt ^ "\n"
 
 let string_of_sfdecl fdecl =
   string_of_typ fdecl.styp ^ " " ^
