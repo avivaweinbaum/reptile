@@ -1,34 +1,34 @@
-module L = Llvm 
-module A = Ast 
-open Sast  
- 
+module L = Llvm
+module A = Ast
+open Sast
+
 module StringMap = Map.Make(String)
 
 (* translate : Sast.program -> Llvm.module *)
 let translate (globals, functions) =
   let context    = L.global_context () in
-  
+
   (* Create the LLVM compilation module into which
      we will generate code *)
   let the_module = L.create_module context "Reptile" in
 
   (* Get types from the context *)
-  let i32_t      = L.i32_type    context 
-  and i8_t       = L.i8_type     context 
-  and i1_t       = L.i1_type     context 
-  and void_t     = L.void_type   context 
+  let i32_t      = L.i32_type    context
+  and i8_t       = L.i8_type     context
+  and i1_t       = L.i1_type     context
+  and void_t     = L.void_type   context
   and float_t    = L.double_type context in
   let rgb_t      = L.struct_type context [| i32_t ; i32_t; i32_t |] in
   let pointer_t  = L.struct_type context [| float_t ; float_t ; rgb_t ; float_t |] in
-  let canvas_t   = L.struct_type context [| float_t ; float_t |] in                    
-  let file_t     = L.struct_type context [| i1_t ; canvas_t |]                     
+  let canvas_t   = L.struct_type context [| float_t ; float_t |] in
+  let file_t     = L.struct_type context [| i1_t ; canvas_t |]
   in
 
  (* Return the LLVM type for a Reptile type *)
   let ltype_of_typ = function
-      A.Int   -> i32_t 
+      A.Int   -> i32_t
     | A.Bool  -> i1_t
-    | A.Void  -> void_t 
+    | A.Void  -> void_t
     | A.Float -> float_t
     | A.Rgb -> rgb_t
     | A.Pointer -> pointer_t
@@ -37,42 +37,42 @@ let translate (globals, functions) =
   in
 
   let global_vars : L.llvalue StringMap.t =
-    let global_var m (t, n) = 
+    let global_var m (t, n) =
       let init = match t with
           A.Float -> L.const_float (ltype_of_typ t) 0.0
         | _ -> L.const_int (ltype_of_typ t) 0
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
 
-  let printf_t : L.lltype = 
+  let printf_t : L.lltype =
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-  let printf_func : L.llvalue = 
+  let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
 
-  let rgbcons_t : L.lltype = 
+  let rgbcons_t : L.lltype =
       L.function_type rgb_t [| i32_t ; i32_t; i32_t |] in
   let rgbcons_fun : L.llvalue =
       L.declare_function "Rgb" rgbcons_t the_module in
 
-  let ptrcons_t : L.lltype = 
+  let ptrcons_t : L.lltype =
       L.function_type pointer_t [| float_t ; float_t ; rgb_t ; float_t |] in
   let ptrcons_fun : L.llvalue =
       L.declare_function "Pointer" ptrcons_t the_module in
 
-  let canvascons_t : L.lltype = 
+  let canvascons_t : L.lltype =
       L.function_type canvas_t  [| float_t ; float_t |]  in
-  let canvascons_fun : L.llvalue = 
+  let canvascons_fun : L.llvalue =
       L.declare_function "Canvas" canvascons_t the_module in
 
-  let filecons_t : L.lltype = 
+  let filecons_t : L.lltype =
       L.function_type file_t  [| i1_t ; canvas_t |] in
-  let filecons_fun : L.llvalue = 
+  let filecons_fun : L.llvalue =
       L.declare_function "File" filecons_t the_module in
-  
+
  (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
-    let function_decl m fdecl = 
+    let function_decl m fdecl =
       let name = fdecl.sfname
       and formal_types =
         Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
@@ -89,11 +89,11 @@ let translate (globals, functions) =
     and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder in
 
     let local_vars =
-      let add_formal m (t, n) p = 
+      let add_formal m (t, n) p =
         L.set_value_name n p;
         let local = L.build_alloca (ltype_of_typ t) n builder in
         ignore (L.build_store p local builder);
-         StringMap.add n local m 
+         StringMap.add n local m
       in
     List.fold_left2 add_formal StringMap.empty fdecl.sformals
       (Array.to_list (L.params the_function)) in
@@ -106,6 +106,7 @@ let translate (globals, functions) =
     let rec expr builder locals ((_, e) : sexpr) = match e with
         SLiteral i  -> L.const_int i32_t i
       | SFliteral f -> L.const_float_of_string float_t f
+      | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s locals) s builder
       | SAssign (s, e) -> let e' = expr builder locals e in
@@ -113,11 +114,11 @@ let translate (globals, functions) =
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
         let e1' = expr builder locals e1
         and e2' = expr builder locals e2 in
-        (match op with 
+        (match op with
           A.Add     -> L.build_fadd
         | A.Sub     -> L.build_fsub
         | A.Mul     -> L.build_fmul
-        | A.Div     -> L.build_fdiv 
+        | A.Div     -> L.build_fdiv
         | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
         | A.Neq     -> L.build_fcmp L.Fcmp.One
         | A.Less    -> L.build_fcmp L.Fcmp.Olt
@@ -125,7 +126,7 @@ let translate (globals, functions) =
         | A.Greater -> L.build_fcmp L.Fcmp.Ogt
         | A.Geq     -> L.build_fcmp L.Fcmp.Oge
         | A.Mod     -> L.build_frem
-        | _         -> raise (Failure ("illegal usage of operator " ^ 
+        | _         -> raise (Failure ("illegal usage of operator " ^
           (A.string_of_op op) ^ " on float"))
         ) e1' e2' "tmp" builder
       | SBinop (e1, op, e2) ->
@@ -150,44 +151,44 @@ let translate (globals, functions) =
       | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder locals e in
           (match op with
-              A.Neg when t = A.Float -> L.build_fneg 
+              A.Neg when t = A.Float -> L.build_fneg
             | A.Neg                  -> L.build_neg
             | A.Not                  -> L.build_not)
           e' "tmp" builder
       | SCall ("print", [e]) ->
           L.build_call printf_func [| int_format_str ; (expr builder locals e) |]
           "printf" builder
-      | SCall("Rgb", [r;g;b]) -> 
+      | SCall("Rgb", [r;g;b]) ->
           let r' = expr builder locals r
-          and g' = expr builder locals g 
+          and g' = expr builder locals g
           and b' = expr builder locals b in
           L.build_call rgbcons_fun [| r' ; g' ; b' |]
               "Rgb" builder
-      | SCall("Pointer", [x;y;color;angle]) -> 
+      | SCall("Pointer", [x;y;color;angle]) ->
           let x' = expr builder locals x
-          and y' = expr builder locals y 
+          and y' = expr builder locals y
           and color' = expr builder locals color
           and angle' = expr builder locals angle in
           L.build_call ptrcons_fun [| x' ; y' ; color' ; angle' |]
               "Pointer" builder
-      | SCall("Canvas", [x;y]) -> 
+      | SCall("Canvas", [x;y]) ->
           let x' = expr builder locals x
           and y' = expr builder locals y in
           L.build_call canvascons_fun [| x' ; y' |]
               "Canvas" builder
-      | SCall("File", [filename;canvas]) -> 
+      | SCall("File", [filename;canvas]) ->
           let filename' = expr builder locals filename
           and canvas' = expr builder locals canvas in
           L.build_call filecons_fun [| filename' ; canvas' |]
               "File" builder
       | SCall (fname, args) ->
         let (ldev, sfd) = StringMap.find fname function_decls in
-        let actuals = List.rev (List.map (fun e -> expr builder locals e) 
+        let actuals = List.rev (List.map (fun e -> expr builder locals e)
             (List.rev args)) in
-        let ret = (match sfd.styp with 
+        let ret = (match sfd.styp with
             A.Void -> ""
-          | _-> fname^"_ret") in 
-        L.build_call ldev (Array.of_list actuals) ret builder 
+          | _-> fname^"_ret") in
+        L.build_call ldev (Array.of_list actuals) ret builder
     in
 
  (* LLVM insists each basic block end with exactly one "terminator"
@@ -205,18 +206,18 @@ let translate (globals, functions) =
 
     let rec stmt builder locals = function
         SBlock sl -> List.fold_left (fun (b, lv) s -> stmt b lv s) (builder,locals) sl
-      | SVar (ty, id) -> 
+      | SVar (ty, id) ->
         let local_var = L.build_alloca (ltype_of_typ ty) id builder in
         let locals = StringMap.add id local_var locals in
         (builder, locals)
-      | SVarAssign (ty, id, v) -> 
+      | SVarAssign (ty, id, v) ->
         let local_var = L.build_alloca (ltype_of_typ ty) id builder in
         let locals = StringMap.add id local_var locals in
           ignore (expr builder locals (ty,SAssign(id, v))); (builder, locals)
       | SExpr e -> ignore(expr builder locals e); (builder,locals)
       | SReturn e -> ignore(match fdecl.styp with
                               (* Special "return nothing" instr *)
-                              A.Void -> L.build_ret_void builder 
+                              A.Void -> L.build_ret_void builder
                               (* Build return statement *)
                             | _ -> L.build_ret (expr builder locals e) builder );
                      (builder,locals)
@@ -242,8 +243,8 @@ let translate (globals, functions) =
         add_terminal (fst (stmt (L.builder_at_end context else_bb) locals else_stmt))
           build_br_merge;
       ignore(L.build_cond_br bool_val then_bb else_bb builder);
-      (L.builder_at_end context merge_bb, locals)               
-    in 
+      (L.builder_at_end context merge_bb, locals)
+    in
 
 
     (* Build the code for each statement in the function *)

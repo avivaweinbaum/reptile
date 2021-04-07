@@ -18,7 +18,7 @@ and sx =
   | SListLit of sexpr list *)
   | SNoexpr
 
-type sstmt = 
+type sstmt =
     SExpr of sexpr
   | SBlock of sstmt list
   | SReturn of sexpr
@@ -43,18 +43,20 @@ let rec string_of_sexpr (t, e) =
   "(" ^ string_of_typ t ^ " : " ^ (match e with
     SLiteral(l) -> string_of_int l
   | SFliteral(f) -> f
+  | SBoolLit(true) -> "true"
+  | SBoolLit(false) -> "false"
   | SId(s) -> s
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
   | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
-  (* | SListAccess(arr, index) -> 
+  (* | SListAccess(arr, index) ->
     arr ^ "[" ^ string_of_sexpr index ^ "]"
   | SListLit(args) -> "[" ^ (List.map string_of_sexpr args) ^ "]" *)
   | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
   | SNoexpr -> ""
-				  ) ^ ")"				     
+				  ) ^ ")"
 
 let rec string_of_sstmt = function
     SBlock(stmts) ->

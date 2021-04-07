@@ -78,11 +78,13 @@ let string_of_uop = function
 
 let rec string_of_expr = function
   Literal(l) -> string_of_int l
-| Fliteral(f) -> f 
+| Fliteral(f) -> f
 | Id(s) -> s
 | Binop(e1, o, e2) ->
   string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
 | Unop(o, e) -> string_of_uop o ^ string_of_expr e
+| BoolLit(true) -> "true"
+| BoolLit(false) -> "false"
 | Call(f, el) ->
   f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
 (* | ListAccess(arr, index) ->
