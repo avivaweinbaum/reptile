@@ -30,5 +30,10 @@ main:                                   # @main
 	.asciz	"%g\n"
 	.size	.Lfmt.1, 4
 
+	.type	.Lfmt.2,@object         # @fmt.2
+.Lfmt.2:
+	.asciz	"%s\n"
+	.size	.Lfmt.2, 4
+
 
 	.section	".note.GNU-stack","",@progbits

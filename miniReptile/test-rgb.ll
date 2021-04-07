@@ -3,16 +3,17 @@ source_filename = "Reptile"
 
 @fmt = private unnamed_addr constant [4 x i8] c"%d\0A\00"
 @fmt.1 = private unnamed_addr constant [4 x i8] c"%g\0A\00"
+@fmt.2 = private unnamed_addr constant [4 x i8] c"%s\0A\00"
 
 declare i32 @printf(i8*, ...)
 
 declare { i32, i32, i32 } @Rgb(i32, i32, i32)
 
-declare { double, double, { i32, i32, i32 }, double } @Pointer(double, double, { i32, i32, i32 }, double)
+declare { i32, i32, { i32, i32, i32 }, double } @Pointer(double, double, { i32, i32, i32 }, double)
 
-declare { double, double } @Canvas(double, double)
+declare { i32, i32 } @Canvas(double, double)
 
-declare { i1, { double, double } } @File(i1, { double, double })
+declare { i1, { i32, i32 } } @File(i1, { i32, i32 })
 
 define i32 @main() {
 entry:
