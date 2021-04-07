@@ -1,12 +1,12 @@
 (* AST for Reptile *)
 (* Aviva Weinbaum, Lindsey Weiskopf, Hariti Patel, Aileen Cano *)
 
-type operator = Add | Sub | Mul | Div | Equal | Neq | Less | Greater | Geq | Leq | 
+type operator = Add | Sub | Mul | Div | Equal | Neq | Less | Greater | Geq | Leq |
           And | Or | Mod
 
 type unoperator = Not | Neg
 
-type typ = Int | String | Void | Bool | Float | Rgb | Canvas | 
+type typ = Int | String | Void | Bool | Float | Rgb | Canvas |
     Pointer | File
     (* | List of typ * int *)
 
@@ -25,7 +25,7 @@ type expr =
   | ListLit of expr list *)
   | Noexpr
 
-type stmt = 
+type stmt =
     Expr of expr
   | Block of stmt list
   | Return of expr
@@ -78,14 +78,14 @@ let string_of_uop = function
 
 let rec string_of_expr = function
   Literal(l) -> string_of_int l
-| Fliteral(f) -> f
+| Fliteral(f) -> f 
 | Id(s) -> s
 | Binop(e1, o, e2) ->
   string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
 | Unop(o, e) -> string_of_uop o ^ string_of_expr e
 | Call(f, el) ->
   f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-(* | ListAccess(arr, index) -> 
+(* | ListAccess(arr, index) ->
   arr ^ "[" ^ string_of_expr index ^ "]"
 | ListLit(args) -> "[" ^ (List.map string_of_expr args) ^ "]" *)
 | Assign(v, e) -> v ^ " = " ^ string_of_expr e
@@ -102,7 +102,7 @@ Block(stmts) ->
 | If(e, s, Block([])) -> "if (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
 | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
       string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
-  
+
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
