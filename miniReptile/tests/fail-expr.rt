@@ -1,0 +1,14 @@
+
+void foo(int c, float d)
+{
+  int a = 0;
+  float b = 0.0;
+  int d = 1;
+  float e = 1.1;
+  b + a;
+}
+
+int main()
+{
+  return 0;
+}

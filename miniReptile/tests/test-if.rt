@@ -1,0 +1,1 @@
+int main() { if (0 < 1) {print(4);} return 0; }
