@@ -8,7 +8,7 @@ test : all testall.sh
 # to test linking external code
 
 .PHONY : all
-all : reptile.native printbig.o
+all : reptile.native rgb # printbig.o
 
 # "make reptile.native" compiles the compiler
 #
@@ -30,15 +30,20 @@ clean :
 
 # Testing the "printbig" example
 
-printbig : printbig.c
-	cc -o printbig -DBUILD_TEST printbig.c
+# printbig : printbig.c
+#	cc -o printbig -DBUILD_TEST printbig.c
 
+rgb : rgb.c
+	gcc -c rgb.c
 # Building the tarball
 
 TESTS = \
-   helloworld
+	helloworld float void assign arithmetic if if2 if3 if4 if5 if6 \
+	else
 
-# FAILS = \
+FAILS = \
+	helloworld float if dead expr func func2 func3 func4 func5 func6 \
+	func7 global if2 nomain return
  # assign1 assign2 assign3 dead1 dead2 expr1 expr2 expr3 float1 float2 \
  # for1 for2 for3 for4 for5 func1 func2 func3 func4 func5 func6 func7 \
  # func8 func9 global1 global2 if1 if2 if3 nomain printbig printb print \
@@ -49,9 +54,8 @@ TESTFILES = $(TESTS:%=test-%.rt) $(TESTS:%=test-%.out) \
 
 TARFILES = ast.ml sast.ml codegen.ml Makefile _tags reptile.ml parser.mly \
 	README scanner.mll semant.ml testall.sh \
-	printbig.c arcade-font.pbm font2c \
 	Dockerfile \
-	$(TESTFILES:%=tests/%) 
+	$(TESTFILES:%=tests/%)
 
 reptile.tar.gz : $(TARFILES)
 	cd .. && tar czf reptile/reptile.tar.gz \

@@ -1,48 +1,120 @@
 (* AST for Reptile *)
 (* Aviva Weinbaum, Lindsey Weiskopf, Hariti Patel, Aileen Cano *)
 
-type operator = Add | Sub | Mul | Div | Equal | Neq | Less | Greater | Geq | 
-          And | Or | Exp | Mod
+type operator = Add | Sub | Mul | Div | Equal | Neq | Less | Greater | Geq | Leq |
+          And | Or | Mod
 
 type unoperator = Not | Neg
-type incoperator = Incr | Decr
 
-type typ = Int | Bool | Float | Void | String | Rgb of bind list | 
-          Canvas of bind list | Pointer of bind list | 
-          File of bind list | Array of typ * int
+type typ = Int | String | Void | Bool | Float | Rgb | Canvas |
+    Pointer | File
+    (* | List of typ * int *)
 
 type bind = typ * string
 
 type expr =
     Binop of expr * operator * expr
   | Unop of unoperator * expr
-  | Inc of expr * incoperator
   | Literal of int
   | Fliteral of string
   | BoolLit of bool
   | Id of string
-  | String of string
-  | Assign of string * expr
   | Call of string * expr list
-  | ArrayAccess of string * expr
-  | ArrayLit of expr list         (* question *)
+  | Assign of string * expr
+  (* | ListAccess of string * expr
+  | ListLit of expr list *)
   | Noexpr
 
-type stmt = 
+type stmt =
     Expr of expr
-  | Return of expr
   | Block of stmt list
+  | Return of expr
   | If of expr * stmt * stmt
-  | For of expr * expr * expr * stmt 
+  | Var of typ * string
+  | VarAssign of typ * string * expr
   | While of expr * stmt
 
-  type func_decl = {
-    (* do we need function keyword here? *)
-    typ : typ;
-    fname : string;
-    formals : bind list;
-    locals : bind list;
-    body : stmt list;
-  }
+type func_decl = {
+  typ : typ;
+  fname : string;
+  formals : bind list;
+  body : stmt list;
+}
 
-  type program = bind list * func_decl list
+type program = bind list * func_decl list
+
+
+(* Pretty-printing functions *)
+
+let string_of_op = function
+Add -> "+"
+| Sub -> "-"
+| Mul -> "*"
+| Div -> "/"
+| Equal -> "=="
+| Neq -> "!="
+| Less -> "<"
+| Leq -> "<="
+| Greater -> ">"
+| Geq -> ">="
+| And -> "&&"
+| Or -> "||"
+| Mod -> "%"
+
+let string_of_typ = function
+  Int -> "int"
+| Bool -> "bool"
+| Void -> "void"
+| Float -> "float"
+| Rgb -> "Rgb"
+| Canvas -> "Canvas"
+| Pointer -> "Pointer"
+| File -> "File"
+(* | List -> "List" *)
+
+let string_of_uop = function
+  Neg -> "-"
+| Not -> "!"
+
+let rec string_of_expr = function
+  Literal(l) -> string_of_int l
+| Fliteral(f) -> f
+| Id(s) -> s
+| Binop(e1, o, e2) ->
+  string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
+| Unop(o, e) -> string_of_uop o ^ string_of_expr e
+| BoolLit(true) -> "true"
+| BoolLit(false) -> "false"
+| Call(f, el) ->
+  f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+(* | ListAccess(arr, index) ->
+  arr ^ "[" ^ string_of_expr index ^ "]"
+| ListLit(args) -> "[" ^ (List.map string_of_expr args) ^ "]" *)
+| Assign(v, e) -> v ^ " = " ^ string_of_expr e
+| Noexpr -> ""
+
+let rec string_of_stmt = function
+Block(stmts) ->
+  "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
+| Expr(expr) -> string_of_expr expr ^ ";\n";
+| Var(typ, var) -> string_of_typ typ ^ " " ^ var ^ "\n"
+| VarAssign(typ, var, ex) -> string_of_typ typ ^ " " ^ var ^ " = " ^ string_of_expr ex ^ "\n"
+| Return(expr) -> "return " ^ string_of_expr expr ^ ";\n"
+| While(expr, stmt) -> "while (" ^ string_of_expr expr ^ ") " ^ string_of_stmt stmt ^ "\n"
+| If(e, s, Block([])) -> "if (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
+| If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
+      string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
+
+
+let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
+
+let string_of_fdecl fdecl =
+string_of_typ fdecl.typ ^ " " ^
+fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
+")\n{\n" ^
+String.concat "" (List.map string_of_stmt fdecl.body) ^
+"}\n"
+
+let string_of_program (vars, funcs) =
+  String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
+  String.concat "\n" (List.map string_of_fdecl funcs)
