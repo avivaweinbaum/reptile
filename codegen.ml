@@ -5,7 +5,7 @@ open Sast
 module StringMap = Map.Make(String)
 
 (* translate : Sast.program -> Llvm.module *)
-let translate (functions) =
+let translate (globals, functions) =
   let context    = L.global_context () in
 
   (* Create the LLVM compilation module into which
@@ -13,7 +13,6 @@ let translate (functions) =
   let the_module = L.create_module context "Reptile" in
 
   (* Get types from the context *)
-<<<<<<< HEAD
   let i32_t      = L.i32_type    context
   and i8_t       = L.i8_type     context
   and i1_t       = L.i1_type     context
@@ -70,20 +69,6 @@ let translate (functions) =
   let filecons_fun : L.llvalue =
       L.declare_function "File" filecons_t the_module in
 
-=======
-  let i32_t      = L.i32_type    context 
-  and i8_t       = L.i8_type     context in
-
- (* Return the LLVM type for a Reptile type *)
-  let ltype_of_typ = function
-      A.Int   -> i32_t in
-
-  let printf_t : L.lltype = 
-      L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-  let printf_func : L.llvalue = 
-      L.declare_function "printf" printf_t the_module in
-
->>>>>>> 139df34e9c4c7fa15534ab029524a4e4d0d68228
  (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -207,14 +192,6 @@ let translate (functions) =
         L.build_call ldev (Array.of_list actuals) ret builder
     in
 
-    (* Construct code for an expression; return its value *)
-    let rec expr builder ((_, e) : sexpr) = match e with
-        SLiteral i  -> L.const_int i32_t i
-      | SCall ("print", [e]) ->
-      L.build_call printf_func [| int_format_str ; (expr builder e) |]
-        "printf" builder 
-    in
-
  (* LLVM insists each basic block end with exactly one "terminator"
        instruction that transfers control.  This function runs "instr builder"
        if the current block does not already have a terminator.  Used,
@@ -270,8 +247,8 @@ let translate (functions) =
       (L.builder_at_end context merge_bb, locals)
     in
 
+
     (* Build the code for each statement in the function *)
-<<<<<<< HEAD
     let (builder,_) = stmt builder local_vars (SBlock fdecl.sbody) in
     (* Add a return if the last block falls off the end *)
       add_terminal builder (match fdecl.styp with
@@ -282,14 +259,3 @@ in
 
 List.iter build_function_body functions;
 the_module
-=======
-    let builder = stmt builder (SBlock fdecl.sbody) in
-
-    (* Add a return if the last block falls off the end *)
-    add_terminal builder (match fdecl.styp with
-        t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
-    in
-
-  List.iter build_function_body functions;
-  the_module
->>>>>>> 139df34e9c4c7fa15534ab029524a4e4d0d68228
