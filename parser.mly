@@ -6,17 +6,18 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LSQUARE RSQUARE
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LSQUARE RSQUARE 
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token TRUE FALSE
-%token EXP INCR DECR MOD
+%token MOD
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID FUNCTION
-%token RGB CANVAS POINTER FILE STRING ARRAY
+%token INT STRING VOID BOOL FLOAT
+%token RGB CANVAS POINTER FILE
+%token RETURN WHILE
+%token RETURN IF ELSE
 %token <int> LITERAL
 %token <bool> BLIT
-%token <string> SLIT
-%token <string> ID FLIT
+%token <string> ID SLIT FLIT
 %token EOF
 
 %start program
@@ -31,7 +32,6 @@ open Ast
 %left LT GT LEQ GEQ
 %left PLUS MINUS
 %left TIMES DIVIDE MOD
-%right INCR DECR
 %left EXP
 %right NOT
 
@@ -42,16 +42,16 @@ program:
 
 decls:
    /* nothing */ { ([], [])               }
- | decls vdecl { (($2 :: fst $1), snd $1) }
  | decls fdecl { (fst $1, ($2 :: snd $1)) }
+ | decls vdecl { (($2 :: fst $1), snd $1) }
 
 fdecl:
-   FUNCTION typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
-     { { typ = $2;
-	 fname = $3;
-	 formals = List.rev $5;
-	 locals = List.rev $8;
-	 body = List.rev $9 } }
+  typ ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
+  { { 
+   typ = $1;
+	 fname = $2;
+	 formals = List.rev $4;
+	 body = List.rev $7 } }
 
 formals_opt:
     /* nothing */ { [] }
@@ -61,52 +61,51 @@ formal_list:
     typ ID                   { [($1,$2)]     }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
+vdecl:
+    typ ID SEMI { ($1, $2) }
+
+vdecl_stmt:
+    typ ID SEMI { Var($1,$2) }
+  | typ ID ASSIGN expr SEMI { VarAssign($1,$2,$4)}
+
 typ:
-    INT   { Int   }
-  | BOOL  { Bool  }
+    STRING { String }
+  | INT { Int }
+  | VOID { Void }
+  | BOOL { Bool }
   | FLOAT { Float }
-  | VOID  { Void  }
-  | STRING { String }
   | RGB { Rgb }
   | CANVAS { Canvas }
+  // | LIST typ LSQUARE LITERAL RSQUARE { List($2, $4) }
   | POINTER { Pointer }
   | FILE { File }
-  | ARRAY typ LSQUARE LITERAL RSQUARE { Array($2, $4) }
-
-vdecl_list:
-    /* nothing */    { [] }
-  | vdecl_list vdecl { $2 :: $1 }
-
-vdecl:
-   typ ID SEMI { ($1, $2) }
 
 stmt_list:
     /* nothing */  { [] }
   | stmt_list stmt { $2 :: $1 }
 
 stmt:
-    expr SEMI                               { Expr $1               }
-  | RETURN expr_opt SEMI                    { Return $2             }
-  | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
+    expr SEMI                               { Expr $1   }
+  | RETURN expr_opt SEMI                    { Return $2 }
+  | LBRACE stmt_list RBRACE                 { Block(List.rev $2) }
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7)        }
-  | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
-                                            { For($3, $5, $7, $9)   }
-  | WHILE LPAREN expr RPAREN stmt           { While($3, $5)         }
+  | vdecl_stmt                              { $1 }
+  | WHILE LPAREN expr RPAREN stmt           { While($3, $5) }
 
 expr_opt:
-    /* nothing */ { Noexpr }
-  | expr          { $1 }
+          { Noexpr }
+  | expr  { $1 }
 
 expr:
     LITERAL          { Literal($1)            }
-  | FLIT	           { Fliteral($1)           }
   | BLIT             { BoolLit($1)            }
-  | ID               { Id($1)                 }
-  | SLIT             { String($1)             }
+  | FLIT             { Fliteral($1)           }
+  // | SLIT             { String($1)             }
+  | ID               { Id($1) }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
-  | expr TIMES  expr { Binop($1, Mult,  $3)   }
+  | expr TIMES  expr { Binop($1, Mul,  $3)   }
   | expr DIVIDE expr { Binop($1, Div,   $3)   }
   | expr EQ     expr { Binop($1, Equal, $3)   }
   | expr NEQ    expr { Binop($1, Neq,   $3)   }
@@ -116,19 +115,16 @@ expr:
   | expr GEQ    expr { Binop($1, Geq,   $3)   }
   | expr AND    expr { Binop($1, And,   $3)   }
   | expr OR     expr { Binop($1, Or,    $3)   }
-  | expr EXP    expr { Binop($1, Exp,   $3)   }
+  // | expr EXP    expr { Binop($1, Exp,   $3)   }
   | expr MOD    expr { Binop($1, Mod,   $3)   }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
-  | expr INCR        { Inc($1, Incr)         }
-  | expr DECR        { Inc($1, Decr)         }
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
+  | typ LPAREN args_opt RPAREN        { Call((string_of_typ $1), $3) }
   | LPAREN expr RPAREN { $2                   }
-  | ID LSQUARE expr RSQUARE { ArrayAccess($1, $3) }
-  | LSQUARE args_list RSQUARE { ArrayLit(List.rev $2) }
-  | TRUE             { BoolLit(true) }
-  | FALSE            { BoolLit(false) }
+  // | ID LSQUARE expr RSQUARE { ListAccess($1, $3) }
+  // | LSQUARE args_list RSQUARE { ListLit(List.rev $2) }
 
 args_opt:
     /* nothing */ { [] }
