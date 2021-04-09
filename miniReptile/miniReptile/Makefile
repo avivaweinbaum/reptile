@@ -8,7 +8,7 @@ test : all testall.sh
 # to test linking external code
 
 .PHONY : all
-all : reptile.native rgb canvas file pointer # printbig.o
+all : reptile.native # printbig.o
 
 # "make reptile.native" compiles the compiler
 #
@@ -33,17 +33,6 @@ clean :
 # printbig : printbig.c
 #	cc -o printbig -DBUILD_TEST printbig.c
 
-rgb : rgb.c
-	gcc -c rgb.c
-
-canvas: canvas.c
-	gcc -c canvas.c
-
-file: file.c
-	gcc -c file.c
-
-pointer: pointer.c
-	gcc -c pointer.c
 # Building the tarball
 
 TESTS = \
@@ -63,7 +52,6 @@ TESTFILES = $(TESTS:%=test-%.rt) $(TESTS:%=test-%.out) \
 
 TARFILES = ast.ml sast.ml codegen.ml Makefile _tags reptile.ml parser.mly \
 	README scanner.mll semant.ml testall.sh \
-	printbig.c \
 	Dockerfile \
 	$(TESTFILES:%=tests/%)
 

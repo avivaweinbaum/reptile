@@ -40,8 +40,8 @@ let check (globals, functions) =
       body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("print", Void, [(Int, "x")]);
       ("Rgb", Rgb, [(Int, "r"); (Int, "g"); (Int, "b")]);
-      ("Pointer", Pointer, [(Int, "x"); (Int, "y"); (Rgb, "color"); (Float, "angle")]);
-      ("Canvas", Canvas, [(Int, "x"); (Int, "y")]);
+      ("Pointer", Pointer, [(Float, "x"); (Float, "y"); (Rgb, "color"); (Float, "angle")]);
+      ("Canvas", Canvas, [(Float, "x"); (Float, "y")]);
       ("File", File, [(String, "filename"); (Canvas, "canvas")]); ]
   in
 
@@ -126,8 +126,7 @@ let check (globals, functions) =
             raise (Failure ("calling failure"))
           else let check_call (ft, _) e = 
             let (et, e') = expr locals e in 
-            let err = "illegal argument found" ^ string_of_typ et ^
-              " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e
+            let err = "illegal argument found"
             in (check_assign ft et err, e')
           in 
           let args' = List.map2 check_call fd.formals args

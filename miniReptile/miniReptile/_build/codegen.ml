@@ -55,12 +55,12 @@ let translate (globals, functions) =
       L.declare_function "Rgb" rgbcons_t the_module in
 
   let ptrcons_t : L.lltype =
-      L.function_type pointer_t [| i32_t ; i32_t ; rgb_t ; float_t |] in
+      L.function_type pointer_t [| float_t ; float_t ; rgb_t ; float_t |] in
   let ptrcons_fun : L.llvalue =
       L.declare_function "Pointer" ptrcons_t the_module in
 
   let canvascons_t : L.lltype =
-      L.function_type canvas_t  [| i32_t ; i32_t |]  in
+      L.function_type canvas_t  [| float_t ; float_t |]  in
   let canvascons_fun : L.llvalue =
       L.declare_function "Canvas" canvascons_t the_module in
 

@@ -1,0 +1,5 @@
+int main() { 
+    Rgb color = Rgb(1,2,5);
+    Pointer pt = Pointer(50, 60, color, 90.0); 
+    return 0; 
+}

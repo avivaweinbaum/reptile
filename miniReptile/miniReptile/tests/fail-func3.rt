@@ -1,0 +1,12 @@
+int foo() {}
+
+void bar() {}
+
+int print() {}
+
+void baz() {}
+
+int main()
+{
+  return 0;
+}
