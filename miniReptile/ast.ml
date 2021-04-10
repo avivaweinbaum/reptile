@@ -23,6 +23,7 @@ type expr =
   | Assign of string * expr
   (* | ListAccess of string * expr
   | ListLit of expr list *)
+  | Access of string * expr
   | Noexpr
 
 type stmt =
@@ -91,6 +92,7 @@ let rec string_of_expr = function
   arr ^ "[" ^ string_of_expr index ^ "]"
 | ListLit(args) -> "[" ^ (List.map string_of_expr args) ^ "]" *)
 | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+| Access(id, e) -> id ^ "." ^ string_of_expr e
 | Noexpr -> ""
 
 let rec string_of_stmt = function

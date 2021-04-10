@@ -16,6 +16,7 @@ and sx =
   | SAssign of string * sexpr
   (* | SListAccess of string * sexpr
   | SListLit of sexpr list *)
+  | SAccess of string * sexpr
   | SNoexpr
 
 type sstmt =
@@ -55,6 +56,7 @@ let rec string_of_sexpr (t, e) =
     arr ^ "[" ^ string_of_sexpr index ^ "]"
   | SListLit(args) -> "[" ^ (List.map string_of_sexpr args) ^ "]" *)
   | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
+  | SAccess(id, e) -> id ^ "." ^ string_of_sexpr e
   | SNoexpr -> ""
 				  ) ^ ")"
 

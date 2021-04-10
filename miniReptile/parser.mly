@@ -9,7 +9,7 @@ open Ast
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LSQUARE RSQUARE 
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token TRUE FALSE
-%token MOD
+%token MOD DOT
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token INT STRING VOID BOOL FLOAT
 %token RGB CANVAS POINTER FILE
@@ -33,6 +33,7 @@ open Ast
 %left PLUS MINUS
 %left TIMES DIVIDE MOD
 %left EXP
+%left DOT
 %right NOT
 
 %%
@@ -121,6 +122,7 @@ expr:
   | NOT expr         { Unop(Not, $2)          }
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
+  | ID DOT expr      { Access($1, $3)         }
   | typ LPAREN args_opt RPAREN        { Call((string_of_typ $1), $3) }
   | LPAREN expr RPAREN { $2                   }
   // | ID LSQUARE expr RSQUARE { ListAccess($1, $3) }

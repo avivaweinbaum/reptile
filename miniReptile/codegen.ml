@@ -103,6 +103,13 @@ let translate (globals, functions) =
                    with Not_found -> StringMap.find n global_vars
     in
 
+    let mem_to_ind ty = match ty  with
+    _ -> List.fold_left (fun m (name, ind) -> StringMap.add name ind m)
+                StringMap.empty [("r",0); ("g",1); ("b",2); ("x",0); ("y",1); 
+                ("color",2); ("angle",3); ("filename",0); ("canvas",1) ]
+    in
+
+
     (* Construct code for an expression; return its value *)
     let rec expr builder locals ((_, e) : sexpr) = match e with
         SLiteral i  -> L.const_int i32_t i
@@ -190,6 +197,23 @@ let translate (globals, functions) =
             A.Void -> ""
           | _-> fname^"_ret") in
         L.build_call ldev (Array.of_list actuals) ret builder
+      | SAccess(id,sx) ->
+        let getI t n = 
+          try StringMap.find n (mem_to_ind t) 
+          with Not_found -> raise(Failure("member not found"))in
+        let getNextVal o t n = L.build_struct_gep o (getI t n) n builder in
+        let rec eval out t = function
+            SAccess(sid, sf)-> eval (getNextVal out t sid) 
+                (L.type_of(getNextVal out t sid)) (snd sf)  
+          | SId sid -> 
+                  let ref = L.build_struct_gep out (getI t sid) sid builder in
+                  L.build_load ref sid builder
+          | SAssign(s,e) -> 
+                let ref = L.build_struct_gep out (getI t s) s builder in
+                let e' =  expr builder locals e in
+                ignore(L.build_store e' ref builder); e'  
+          | _ -> raise(Failure("invalid field usage"))
+        in eval (lookup id locals) (L.type_of (lookup id locals)) (snd sx)
     in
 
  (* LLVM insists each basic block end with exactly one "terminator"

@@ -91,6 +91,26 @@ let check (globals, functions) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
+    (* Rgb | Canvas |
+    Pointer | File *)
+
+    (* ("Rgb", Rgb, [(Int, "r"); (Int, "g"); (Int, "b")]);
+    ("Pointer", Pointer, [(Int, "x"); (Int, "y"); (Rgb, "color"); (Float, "angle")]);
+    ("Canvas", Canvas, [(Int, "x"); (Int, "y")]);
+    ("File", File, [(String, "filename"); (Canvas, "canvas")]) *)
+
+    let member_map_of_type ty = match ty with
+        Rgb -> List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+            StringMap.empty [(Int, "r"); (Int, "g"); (Int, "b")]
+      | Pointer -> List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+            StringMap.empty [(Int, "x"); (Int, "y"); (Rgb, "color"); (Float, "angle")]
+      | Canvas -> List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+            StringMap.empty [(Int, "x"); (Int, "y")]
+      | File -> List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+            StringMap.empty [(String, "filename"); (Canvas, "canvas")]
+      | _ -> raise (Failure ("type " ^ string_of_typ ty ^ " does not have members"))
+    in
+
     (* Return a semantically-checked expression, i.e., with a type *)
     let rec expr locals = function
         Literal  l -> (Int, SLiteral l)
@@ -138,6 +158,29 @@ let check (globals, functions) =
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
           in (check_assign lt rt err, SAssign(var, (rt, e')))
+      | Access(id, ex) ->
+          let typ = type_of_identifier locals id in
+          let map = member_map_of_type typ in
+          let smem = match ex with
+              Assign(v,e) as exp-> 
+                   let ty = type_of_identifier map v in
+                      (match e with
+                         Fliteral _ -> 
+                            let lt = StringMap.find v map
+                            and (rt, e') = expr locals e in
+                            let err = "illegal assignment of object field" ^ 
+                                string_of_typ lt ^ " = " ^ 
+                                string_of_typ rt ^ " in " ^ 
+                                string_of_expr exp ^ " for identifier Field." ^ v
+                            in (check_assign lt rt err, SAssign(v, (rt, e')))
+                        | Id s ->  (ty,SAssign(v,(ty, SId s)) ) 
+                        | _ -> raise (Failure ("illegal member access - "
+                                  ^ " expression type is not a field"))) 
+              | _ -> expr map ex 
+            in
+          (fst smem, SAccess(id, smem))
+
+
       (* | ListAccess(lst, idx)
 
       | ListLit *)
