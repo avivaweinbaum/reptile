@@ -91,14 +91,6 @@ let check (globals, functions) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
-    (* Rgb | Canvas |
-    Pointer | File *)
-
-    (* ("Rgb", Rgb, [(Int, "r"); (Int, "g"); (Int, "b")]);
-    ("Pointer", Pointer, [(Int, "x"); (Int, "y"); (Rgb, "color"); (Float, "angle")]);
-    ("Canvas", Canvas, [(Int, "x"); (Int, "y")]);
-    ("File", File, [(String, "filename"); (Canvas, "canvas")]) *)
-
     let member_map_of_type ty = match ty with
         Rgb -> List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
             StringMap.empty [(Int, "r"); (Int, "g"); (Int, "b")]
@@ -159,13 +151,13 @@ let check (globals, functions) =
             string_of_typ rt ^ " in " ^ string_of_expr ex
           in (check_assign lt rt err, SAssign(var, (rt, e')))
       | Access(id, ex) ->
-          let typ = type_of_identifier locals id in
-          let map = member_map_of_type typ in
+          let ty = type_of_identifier locals id in
+          let map = member_map_of_type ty in
           let smem = match ex with
               Assign(v,e) as exp-> 
                    let ty = type_of_identifier map v in
                       (match e with
-                         Fliteral _ -> 
+                        _ -> 
                             let lt = StringMap.find v map
                             and (rt, e') = expr locals e in
                             let err = "illegal assignment of object field" ^ 

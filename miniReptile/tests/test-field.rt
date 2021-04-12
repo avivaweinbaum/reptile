@@ -2,5 +2,11 @@ int main() {
     Rgb color = Rgb(1,2,3); 
     int r = color.r;
     print(r);
+    color.r = 9;
+    print(color.r);
+
+    Pointer ptr = Pointer(4, 5, color, 3.3);
+    print(ptr.color.b);
+
     return 0; 
 }

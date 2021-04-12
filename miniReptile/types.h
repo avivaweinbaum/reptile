@@ -2,35 +2,30 @@
 #include<math.h>
 
 
-/* struct Rgb {
+typedef struct rgb {
     int r;
     int g;
     int b;
-};
+} rgb;
 
-struct Pointer {
+struct pointer {
     int x;
     int y;
-    Rgb color;
+    struct rgb color;
     float angle;
 };
 
-struct Canvas {
+struct canvas {
     int x;
     int y;
 };
 
-struct File {
-    char filename;
-    Canvas canvas;
-}; */
+struct file {
+    char *filename;
+    struct canvas canvas;
+};
 
-struct Rgb* Rgb(int r, int g, int b);
-struct Canvas* Canvas(int x, int y);
-struct Pointer* Pointer(int x, int y, struct Rgb* color, float angle);
-struct File* File(char filename, struct Canvas* canvas);
-
-// typedef struct Rgb Rgb;
-// typedef struct Canvas Canvas;
-// typedef struct Pointer Pointer;
-// typedef struct File File; 
+struct rgb Rgb(int r, int g, int b);
+struct canvas Canvas(int x, int y);
+struct pointer Pointer(int x, int y, struct rgb color, float angle);
+struct file File(char *filename, struct canvas canvas);
