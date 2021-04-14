@@ -42,7 +42,9 @@ let check (globals, functions) =
       ("Rgb", Rgb, [(Int, "r"); (Int, "g"); (Int, "b")]);
       ("Pointer", Pointer, [(Int, "x"); (Int, "y"); (Rgb, "color"); (Float, "angle")]);
       ("Canvas", Canvas, [(Int, "x"); (Int, "y")]);
-      ("File", File, [(String, "filename"); (Canvas, "canvas")]); ]
+      ("File", File, [(String, "filename"); (Canvas, "canvas")]); 
+      ("create", Void, [(Canvas, "canvas")]);
+      ("save", Void, [(File, "file")]); ];
   in
 
   (* Add function name to symbol table *)

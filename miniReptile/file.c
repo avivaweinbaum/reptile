@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "types.h"
 
+
 // struct File {
 //     char *filename;
 //     struct Canvas canvas;

@@ -69,6 +69,16 @@ let translate (globals, functions) =
   let filecons_fun : L.llvalue =
       L.declare_function "File" filecons_t the_module in
 
+  let createcons_t : L.lltype =
+      L.function_type i32_t  [| canvas_t |] in
+  let createcons_fun : L.llvalue =
+      L.declare_function "create" createcons_t the_module in
+
+  let savecons_t : L.lltype =
+      L.function_type i32_t  [| file_t |] in
+  let savecons_fun : L.llvalue =
+      L.declare_function "save" savecons_t the_module in
+
  (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -189,6 +199,14 @@ let translate (globals, functions) =
           and canvas' = expr builder locals canvas in
           L.build_call filecons_fun [| filename' ; canvas' |]
               "File" builder
+      | SCall("create", [canvas]) ->
+          let canvas' = expr builder locals canvas in
+          L.build_call createcons_fun [| canvas' |]
+              "create" builder
+      | SCall("save", [file]) ->
+          let file' = expr builder locals file in
+          L.build_call savecons_fun [| file' |]
+              "save" builder
       | SCall (fname, args) ->
         let (ldev, sfd) = StringMap.find fname function_decls in
         let actuals = List.rev (List.map (fun e -> expr builder locals e)

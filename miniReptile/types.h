@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<math.h>
+#include "png.h"
 
 
 typedef struct rgb {
@@ -18,6 +19,7 @@ struct pointer {
 struct canvas {
     int x;
     int y;
+    libattopng_t* png;
 };
 
 struct file {

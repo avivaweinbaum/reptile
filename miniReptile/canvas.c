@@ -2,6 +2,7 @@
 #include<math.h>
 #include <stdlib.h>
 #include "types.h"
+#include "png.h"
 
 struct Canvas {
     int x;
@@ -19,5 +20,6 @@ struct canvas Canvas(int x, int y) {
     struct canvas can;    
     can.x = x;
     can.y = y;
+
     return can;
 }
