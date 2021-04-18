@@ -10,6 +10,7 @@ and sx =
   | SLiteral of int
   | SBoolLit of bool
   | SFliteral of string
+  | SSliteral of string
   | SId of string
   | SString of string
   | SCall of string * sexpr list
@@ -44,6 +45,7 @@ let rec string_of_sexpr (t, e) =
   "(" ^ string_of_typ t ^ " : " ^ (match e with
     SLiteral(l) -> string_of_int l
   | SFliteral(f) -> f
+  | SSliteral(s) -> s
   | SBoolLit(true) -> "true"
   | SBoolLit(false) -> "false"
   | SId(s) -> s

@@ -1,1 +1,7 @@
-int main() { Canvas can = Canvas(400, 400); File file = File("c", can); create(can); save(file); return 0;}
+int main() { 
+    Canvas can = Canvas(400, 400); 
+    File file = File("myfile", can); 
+    create(can); 
+    save(file); 
+    return 0;
+}

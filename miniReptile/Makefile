@@ -56,7 +56,7 @@ pixelator: pixelator.c
 
 TESTS = \
 	helloworld float void assign arithmetic if if2 if3 if4 if5 if6 \
-	else
+	else string
 
 FAILS = \
 	helloworld float if dead expr func func2 func3 func4 func5 func6 \

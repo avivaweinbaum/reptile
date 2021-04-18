@@ -17,11 +17,12 @@ let translate (globals, functions) =
   and i8_t       = L.i8_type     context
   and i1_t       = L.i1_type     context
   and void_t     = L.void_type   context
-  and float_t    = L.double_type context in
+  and float_t    = L.double_type context
+  and string_t   = L.pointer_type (L.i8_type context) in
   let rgb_t      = L.struct_type context [| i32_t ; i32_t; i32_t |] in
   let pointer_t  = L.struct_type context [| i32_t ; i32_t ; rgb_t ; float_t |] in
   let canvas_t   = L.struct_type context [| i32_t ; i32_t |] in
-  let file_t     = L.struct_type context [| i1_t ; canvas_t |]
+  let file_t     = L.struct_type context [| string_t ; canvas_t |]
   in
 
  (* Return the LLVM type for a Reptile type *)
@@ -30,6 +31,7 @@ let translate (globals, functions) =
     | A.Bool  -> i1_t
     | A.Void  -> void_t
     | A.Float -> float_t
+    | A.String -> string_t
     | A.Rgb -> rgb_t
     | A.Pointer -> pointer_t
     | A.Canvas -> canvas_t
@@ -65,7 +67,7 @@ let translate (globals, functions) =
       L.declare_function "Canvas" canvascons_t the_module in
 
   let filecons_t : L.lltype =
-      L.function_type file_t  [| i1_t ; canvas_t |] in
+      L.function_type file_t  [| string_t ; canvas_t |] in
   let filecons_fun : L.llvalue =
       L.declare_function "File" filecons_t the_module in
 
@@ -124,6 +126,7 @@ let translate (globals, functions) =
     let rec expr builder locals ((_, e) : sexpr) = match e with
         SLiteral i  -> L.const_int i32_t i
       | SFliteral f -> L.const_float_of_string float_t f
+      | SSliteral s -> L.build_global_stringptr s "str" builder
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s locals) s builder

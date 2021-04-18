@@ -109,6 +109,7 @@ let check (globals, functions) =
     let rec expr locals = function
         Literal  l -> (Int, SLiteral l)
       | Fliteral f -> (Float, SFliteral f)
+      | Sliteral s -> (String, SSliteral s)
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier locals s, SId s)
       (* | Unop(op, e) as ex -> 

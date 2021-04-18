@@ -17,6 +17,7 @@ type expr =
   | Unop of unoperator * expr
   | Literal of int
   | Fliteral of string
+  | Sliteral of string
   | BoolLit of bool
   | Id of string
   | Call of string * expr list
@@ -67,6 +68,7 @@ let string_of_typ = function
 | Bool -> "bool"
 | Void -> "void"
 | Float -> "float"
+| String -> "string"
 | Rgb -> "Rgb"
 | Canvas -> "Canvas"
 | Pointer -> "Pointer"
@@ -80,6 +82,7 @@ let string_of_uop = function
 let rec string_of_expr = function
   Literal(l) -> string_of_int l
 | Fliteral(f) -> f
+| Sliteral(s) -> s
 | Id(s) -> s
 | Binop(e1, o, e2) ->
   string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
