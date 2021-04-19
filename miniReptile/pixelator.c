@@ -11,10 +11,17 @@ void create(struct canvas canvas) {
     png = libattopng_new(canvas.x, canvas.y, PNG_RGBA);
 }
 
+struct pointer pixel(struct pointer pointer, int x, int y) {
 
-void save(struct file file) {
-    int x = libattopng_save(png, strcat(file.filename, ".png"));
-    printf(x);
-    //libattopng_save(png, strcat("hello", ".png"));
+    libattopng_set_pixel(png, x, y, 0x77073096);
+
+    pointer.x = x;
+    pointer.y = y;
+    return pointer;
+}
+
+
+void save(char *filename) {
+    libattopng_save(png, filename);
     libattopng_destroy(png);
 }

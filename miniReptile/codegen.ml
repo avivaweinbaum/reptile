@@ -77,9 +77,14 @@ let translate (globals, functions) =
       L.declare_function "create" createcons_t the_module in
 
   let savecons_t : L.lltype =
-      L.function_type i32_t  [| file_t |] in
+      L.function_type i32_t  [| string_t |] in
   let savecons_fun : L.llvalue =
       L.declare_function "save" savecons_t the_module in
+
+  let pixelcons_t : L.lltype =
+      L.function_type pointer_t  [| pointer_t ; i32_t ; i32_t |] in
+  let pixelcons_fun : L.llvalue =
+      L.declare_function "pixel" pixelcons_t the_module in
 
  (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
@@ -206,10 +211,16 @@ let translate (globals, functions) =
           let canvas' = expr builder locals canvas in
           L.build_call createcons_fun [| canvas' |]
               "create" builder
-      | SCall("save", [file]) ->
-          let file' = expr builder locals file in
-          L.build_call savecons_fun [| file' |]
+      | SCall("save", [filename]) ->
+          let filename' = expr builder locals filename in
+          L.build_call savecons_fun [| filename' |]
               "save" builder
+      | SCall("pixel", [pointer;x;y]) ->
+        let pointer' = expr builder locals pointer
+        and x' = expr builder locals x
+        and y' = expr builder locals y in
+        L.build_call pixelcons_fun [| pointer';x';y' |]
+            "pixel" builder
       | SCall (fname, args) ->
         let (ldev, sfd) = StringMap.find fname function_decls in
         let actuals = List.rev (List.map (fun e -> expr builder locals e)

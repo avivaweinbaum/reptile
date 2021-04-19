@@ -1,0 +1,13 @@
+int main() { 
+    Canvas can = Canvas(400, 400); 
+    create(can);
+    Pointer ptr = Pointer(200, 200, Rgb(100, 100, 100), 3.1);
+    ptr = pixel(ptr, 200, 200);
+    ptr = pixel(ptr, 201, 200);
+    ptr = pixel(ptr, 202, 200);
+    ptr = pixel(ptr, 203, 200);
+    ptr = pixel(ptr, 204, 200);
+    ptr = pixel(ptr, 205, 200);
+    save("pixeltest.png"); 
+    return 0;
+}

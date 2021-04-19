@@ -44,7 +44,9 @@ let check (globals, functions) =
       ("Canvas", Canvas, [(Int, "x"); (Int, "y")]);
       ("File", File, [(String, "filename"); (Canvas, "canvas")]); 
       ("create", Void, [(Canvas, "canvas")]);
-      ("save", Void, [(File, "file")]); ];
+      ("save", Void, [(String, "filename")]); 
+      ("pixel", Pointer, [(Pointer, "pointer"); (Int, "x"); (Int, "y")]);
+      ];
   in
 
   (* Add function name to symbol table *)
