@@ -1,5 +1,5 @@
 int main() { 
-    Canvas can = Canvas(400, 400); 
+    Canvas can = Canvas(800, 800); 
     create(can);
     save("myfile.png"); 
     return 0;

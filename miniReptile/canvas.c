@@ -16,10 +16,10 @@ struct Canvas {
 //     return can;
 // }
 
-struct canvas Canvas(int x, int y) {
-    struct canvas can;    
-    can.x = x;
-    can.y = y;
+struct canvas* Canvas(int x, int y) {
+    struct canvas *can = malloc(sizeof(struct canvas));    
+    can->x = x;
+    can->y = y;
 
     return can;
 }
