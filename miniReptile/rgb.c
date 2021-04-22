@@ -3,11 +3,11 @@
 #include<math.h>
 #include "types.h"
 
-// struct Rgb {
-//     int r;
-//     int g;
-//     int b;
-// };
+struct Rgb {
+   int r;
+   int g;
+   int b;
+};
 
 // struct Rgb* Rgb(int r, int g, int b) {
 //     struct Rgb* color = malloc(sizeof(struct Rgb));
@@ -17,11 +17,11 @@
 //     return color;
 // }
 
-struct rgb Rgb(int r, int g, int b) {
-    struct rgb color;
-    color.r = r;
-    color.g = g;
-    color.b = b;
+struct rgb* Rgb(int r, int g, int b) {
+    struct rgb *color = malloc(sizeof(struct rgb));
+    color->r = r;
+    color->g = g;
+    color->b = b;
     return color;
 }
 

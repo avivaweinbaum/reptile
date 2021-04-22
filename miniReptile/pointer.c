@@ -4,12 +4,12 @@
 #include "types.h"
 
 
-// struct Pointer {
-//      int x;
-//      int y;
-//      struct Rgb color;
-//      float angle;
-// };
+struct Pointer {
+    int x;
+    int y;
+    struct rgb* color;
+    float angle;
+};
 
 // struct Pointer* Pointer(int x, int y, struct Rgb* color, float angle) {
 //     struct Pointer* point = malloc(sizeof(struct Pointer));
@@ -20,11 +20,11 @@
 //     return point;
 // }
 
-struct pointer Pointer(int x, int y, struct rgb color, float angle) {
-    struct pointer point;
-    point.x = x;
-    point.y = y;
-    point.color = color;
-    point.angle = angle;
+struct pointer* Pointer(int x, int y, struct rgb* color, float angle) {
+    struct pointer *point = malloc(sizeof(struct pointer));
+    point->x = x;
+    point->y = y;
+    point->color = *color;
+    point->angle = angle;
     return point;
 }

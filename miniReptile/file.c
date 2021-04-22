@@ -5,10 +5,10 @@
 #include "types.h"
 
 
-// struct File {
-//     char *filename;
-//     struct Canvas canvas;
-// };
+struct File {
+    char *filename;
+    struct canvas* canvas;
+};
 
 // struct File* File(char filename, struct Canvas* canvas) {
 //     struct File* f = malloc(sizeof(struct File));
@@ -17,10 +17,10 @@
 //     return f;
 // }
 
-struct file File(char *filename, struct canvas canvas) {
-    struct file f;
+struct file* File(char *filename, struct canvas* canv) {
+    struct file *f = malloc(sizeof(struct file));
     char str1[20];
-    f.filename = strcpy(str1, filename);
-    f.canvas = canvas;
+    f->filename = strcpy(str1, filename);
+    f->canvas = *canv;
     return f;
 }

@@ -27,7 +27,7 @@ struct file {
     struct canvas canvas;
 };
 
-struct rgb Rgb(int r, int g, int b);
-struct canvas Canvas(int x, int y);
-struct pointer Pointer(int x, int y, struct rgb color, float angle);
-struct file File(char *filename, struct canvas canvas);
+struct rgb* Rgb(int r, int g, int b);
+struct canvas* Canvas(int x, int y);
+struct pointer* Pointer(int x, int y, struct rgb* color, float angle);
+struct file* File(char *filename, struct canvas* canvas);
