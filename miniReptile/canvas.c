@@ -25,6 +25,6 @@ struct canvas* Canvas(int x, int y) {
     return can;
 }
 
-void destroy_canvas (struct canvas* this) {
-    libattopng_destroy(this->png);
-}
+// void destroy_canvas (struct canvas* this) {
+//     libattopng_destroy(this->png);
+// }
