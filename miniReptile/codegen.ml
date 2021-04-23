@@ -56,6 +56,16 @@ let translate (globals, functions) =
   let rgbcons_fun : L.llvalue =
       L.declare_function "Rgb" rgbcons_t the_module in
 
+  let getR_rgb_cons_t : L.lltype =
+      L.function_type i32_t [| rgb_t;|] in
+  let getR_rgb_cons_fun : L.llvalue =
+      L.declare_function "getR_rgb" getR_rgb_cons_t the_module in
+
+  let setR_rgb_cons_t : L.lltype =
+      L.function_type rgb_t [| rgb_t; i32_t;|] in
+  let setR_rgb_cons_fun : L.llvalue =
+      L.declare_function "setR_rgb" setR_rgb_cons_t the_module in
+
   let ptrcons_t : L.lltype =
       L.function_type pointer_t [| i32_t ; i32_t ; rgb_t ; float_t |] in
   let ptrcons_fun : L.llvalue =
@@ -184,11 +194,18 @@ let translate (globals, functions) =
       | SCall ("print", [e]) ->
           L.build_call printf_func [| int_format_str ; (expr builder locals e) |]
           "printf" builder
-      | SCall("Rgb", [r;g;b]) ->
+      (* | SCall("Rgb", [r;g;b]) ->
           let r' = expr builder locals r
           and g' = expr builder locals g
           and b' = expr builder locals b in
           L.build_call rgbcons_fun [| r' ; g' ; b' |]
+              "Rgb" builder *)
+      | SCall ("Rgb", [r;g;b]) ->
+          let build_t : L.lltype = 
+            L.function_type rgb_t [|i32_t; i32_t; i32_t;|] in 
+              let build_func : L.llvalue = 
+                L.declare_function "Rgb" rgbcons_t the_module in
+          L.build_call rgbcons_fun [| expr builder locals r; expr builder locals g; expr builder locals b; |]
               "Rgb" builder
       | SCall("Pointer", [x;y;color;angle]) ->
           let x' = expr builder locals x
@@ -221,6 +238,15 @@ let translate (globals, functions) =
         and y' = expr builder locals y in
         L.build_call pixelcons_fun [| pointer';x';y' |]
             "pixel" builder
+      | SCall("getR_rgb", [rgb;]) ->
+        let rgb' = expr builder locals rgb in
+        L.build_call getR_rgb_cons_fun [| rgb' |]
+            "getR_rgb" builder
+      | SCall("setR_rgb", [rgb; r_new]) ->
+        let rgb' = expr builder locals rgb 
+        and r_new' = expr builder locals r_new in
+        L.build_call setR_rgb_cons_fun [| rgb'; r_new' |]
+            "setR_rgb" builder
       | SCall (fname, args) ->
         let (ldev, sfd) = StringMap.find fname function_decls in
         let actuals = List.rev (List.map (fun e -> expr builder locals e)

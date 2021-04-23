@@ -46,6 +46,8 @@ let check (globals, functions) =
       ("create", Void, [(Canvas, "canvas")]);
       ("save", Void, [(String, "filename")]); 
       ("pixel", Pointer, [(Pointer, "pointer"); (Int, "x"); (Int, "y")]);
+      ("getR_rgb", Int, [(Rgb, "rgb");]);
+      ("setR_rgb", Rgb, [(Rgb, "rgb"); (Int, "r_new");]);
       ];
   in
 

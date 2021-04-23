@@ -25,3 +25,13 @@ struct rgb* Rgb(int r, int g, int b) {
     return color;
 }
 
+int getR_rgb(struct rgb* rgb) {
+    return rgb->r;
+}
+
+struct rgb* setR_rgb(struct rgb* rgb, int r_new) {
+    rgb->r = r_new;
+ 
+    return rgb;
+}
+

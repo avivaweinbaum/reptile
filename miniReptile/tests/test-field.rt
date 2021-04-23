@@ -1,12 +1,11 @@
 int main() { 
     Rgb color = Rgb(1,2,3); 
-    int r = color.r;
+    int r = getR_rgb(color);
     print(r);
-    color.r = 9;
-    print(color.r);
 
-    Pointer ptr = Pointer(4, 5, color, 3.3);
-    print(ptr.color.b);
+    color = setR_rgb(color, 9);
+    print(getR_rgb(color));
+    
 
     return 0; 
 }
