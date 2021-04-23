@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "types.h"
+#include "png.h"
 
 #ifndef _PIXELATOR_H_
 #define _PIXELATOR_H_
 #endif
 
-void create(struct canvas canvas);
 
-struct pointer pixel(struct pointer pointer, int x, int y);
+struct canvas* pixel(struct canvas* can, struct rgb* color, int x, int y);
 
-void save(char *filename);
+void save(struct canvas* can, char *filename);

@@ -75,18 +75,18 @@ let translate (globals, functions) =
   let canvascons_fun : L.llvalue =
       L.declare_function "Canvas" canvascons_t the_module in
 
-  let createcons_t : L.lltype =
+  (* let createcons_t : L.lltype =
       L.function_type i32_t  [| canvas_t |] in
   let createcons_fun : L.llvalue =
-      L.declare_function "create" createcons_t the_module in
+      L.declare_function "create" createcons_t the_module in *)
 
   let savecons_t : L.lltype =
-      L.function_type i32_t  [| string_t |] in
+      L.function_type i32_t  [| canvas_t ; string_t |] in
   let savecons_fun : L.llvalue =
       L.declare_function "save" savecons_t the_module in
 
   let pixelcons_t : L.lltype =
-      L.function_type pointer_t  [| pointer_t ; i32_t ; i32_t |] in
+      L.function_type canvas_t  [| canvas_t ; rgb_t; i32_t ; i32_t |] in
   let pixelcons_fun : L.llvalue =
       L.declare_function "pixel" pixelcons_t the_module in
 
@@ -211,19 +211,21 @@ let translate (globals, functions) =
           and y' = expr builder locals y in
           L.build_call canvascons_fun [| x' ; y' |]
               "Canvas" builder
-      | SCall("create", [canvas]) ->
+      (* | SCall("create", [canvas]) ->
           let canvas' = expr builder locals canvas in
           L.build_call createcons_fun [| canvas' |]
-              "create" builder
-      | SCall("save", [filename]) ->
-          let filename' = expr builder locals filename in
-          L.build_call savecons_fun [| filename' |]
+              "create" builder *)
+      | SCall("save", [can;filename]) ->
+          let can' = expr builder locals can
+          and filename' = expr builder locals filename in
+          L.build_call savecons_fun [| can' ; filename' |]
               "save" builder
-      | SCall("pixel", [pointer;x;y]) ->
-        let pointer' = expr builder locals pointer
+      | SCall("pixel", [can;color;x;y]) ->
+        let can' = expr builder locals can
+        and color' = expr builder locals color
         and x' = expr builder locals x
         and y' = expr builder locals y in
-        L.build_call pixelcons_fun [| pointer';x';y' |]
+        L.build_call pixelcons_fun [| can';color';x';y' |]
             "pixel" builder
       | SCall("getR_rgb", [rgb;]) ->
         let rgb' = expr builder locals rgb in
