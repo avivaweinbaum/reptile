@@ -14,9 +14,7 @@ void create(struct canvas* canvas) {
 
 struct pointer* pixel(struct pointer* pointer, int x, int y) {
 
-    libattopng_set_pixel(png, x, y, RGBA(x & 255, y & 255, 128, (255 - ((x / 2) & 255))));
-    libattopng_set_pixel(png, x+1, y+1, RGBA(x & 255, y & 255, 128, (255 - ((x / 2) & 255))));
-    libattopng_set_pixel(png, x+2, y+2, RGBA(x & 255, y & 255, 128, (255 - ((x / 2) & 255))));
+    libattopng_set_pixel(png, x, y, RGBA(0 & 255, 0 & 255, 0, (255 )));
     pointer->x = x;
     pointer->y = y;
     return pointer;
