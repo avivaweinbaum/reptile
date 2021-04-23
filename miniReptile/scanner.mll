@@ -23,7 +23,6 @@ rule token = parse
 | '-'      { MINUS }
 | '*'      { TIMES }
 | '/'      { DIVIDE }
-| '%'      { MOD }
 | "=="     { EQ }
 | "!="     { NEQ }
 | '<'      { LT }
@@ -42,9 +41,9 @@ rule token = parse
 | "bool"   { BOOL }
 | "Rgb"    { RGB }
 | "Canvas" { CANVAS }
-(* | "List"   { LIST } *)
 | "Pointer" { POINTER }
-| "File"   { FILE }
+| "true"   { BLIT(true) }
+| "false"   { BLIT(false) }
 | "while"  { WHILE }
 | "return" { RETURN }
 | digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }

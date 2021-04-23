@@ -2,13 +2,11 @@
 (* Aviva Weinbaum, Lindsey Weiskopf, Hariti Patel, Aileen Cano *)
 
 type operator = Add | Sub | Mul | Div | Equal | Neq | Less | Greater | Geq | Leq |
-          And | Or | Mod
+          And | Or
 
 type unoperator = Not | Neg
 
-type typ = Int | String | Void | Bool | Float | Rgb | Canvas |
-    Pointer | File
-    (* | List of typ * int *)
+type typ = Int | String | Void | Bool | Float | Rgb | Canvas | Pointer
 
 type bind = typ * string
 
@@ -22,8 +20,6 @@ type expr =
   | Id of string
   | Call of string * expr list
   | Assign of string * expr
-  (* | ListAccess of string * expr
-  | ListLit of expr list *)
   | Access of string * expr
   | Noexpr
 
@@ -61,7 +57,6 @@ Add -> "+"
 | Geq -> ">="
 | And -> "&&"
 | Or -> "||"
-| Mod -> "%"
 
 let string_of_typ = function
   Int -> "int"
@@ -72,8 +67,6 @@ let string_of_typ = function
 | Rgb -> "Rgb"
 | Canvas -> "Canvas"
 | Pointer -> "Pointer"
-| File -> "File"
-(* | List -> "List" *)
 
 let string_of_uop = function
   Neg -> "-"
@@ -91,9 +84,6 @@ let rec string_of_expr = function
 | BoolLit(false) -> "false"
 | Call(f, el) ->
   f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-(* | ListAccess(arr, index) ->
-  arr ^ "[" ^ string_of_expr index ^ "]"
-| ListLit(args) -> "[" ^ (List.map string_of_expr args) ^ "]" *)
 | Assign(v, e) -> v ^ " = " ^ string_of_expr e
 | Access(id, e) -> id ^ "." ^ string_of_expr e
 | Noexpr -> ""

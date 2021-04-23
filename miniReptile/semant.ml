@@ -42,7 +42,6 @@ let check (globals, functions) =
       ("Rgb", Rgb, [(Int, "r"); (Int, "g"); (Int, "b")]);
       ("Pointer", Pointer, [(Int, "x"); (Int, "y"); (Rgb, "color"); (Float, "angle")]);
       ("Canvas", Canvas, [(Int, "x"); (Int, "y")]);
-      ("File", File, [(String, "filename"); (Canvas, "canvas")]); 
       ("create", Void, [(Canvas, "canvas")]);
       ("save", Void, [(String, "filename")]); 
       ("pixel", Pointer, [(Pointer, "pointer"); (Int, "x"); (Int, "y")]);
@@ -104,8 +103,6 @@ let check (globals, functions) =
             StringMap.empty [(Int, "x"); (Int, "y"); (Rgb, "color"); (Float, "angle")]
       | Canvas -> List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
             StringMap.empty [(Int, "x"); (Int, "y")]
-      | File -> List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
-            StringMap.empty [(String, "filename"); (Canvas, "canvas")]
       | _ -> raise (Failure ("type " ^ string_of_typ ty ^ " does not have members"))
     in
 
@@ -114,15 +111,16 @@ let check (globals, functions) =
         Literal  l -> (Int, SLiteral l)
       | Fliteral f -> (Float, SFliteral f)
       | Sliteral s -> (String, SSliteral s)
+      | BoolLit  l -> (Bool, SBoolLit l)
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier locals s, SId s)
-      (* | Unop(op, e) as ex -> 
-          let (t, e') = expr e in
+      | Unop(op, e) as ex -> 
+          let (t, e') = expr locals e in
           let ty = match op with
             Neg when t = Int -> t
           | Not when t = Bool -> Bool
           | _ -> raise (Failure ("illegal unary operator"))
-          in (ty, SUnop(op, (t, e'))) *)
+          in (ty, SUnop(op, (t, e')))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr locals e1 
           and (t2, e2') = expr locals e2 in

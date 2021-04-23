@@ -35,7 +35,6 @@ let translate (globals, functions) =
     | A.Rgb -> rgb_t
     | A.Pointer -> pointer_t
     | A.Canvas -> canvas_t
-    | A.File -> file_t
   in
 
   let global_vars : L.llvalue StringMap.t =
@@ -75,11 +74,6 @@ let translate (globals, functions) =
       L.function_type canvas_t  [| i32_t ; i32_t |]  in
   let canvascons_fun : L.llvalue =
       L.declare_function "Canvas" canvascons_t the_module in
-
-  let filecons_t : L.lltype =
-      L.function_type file_t  [| string_t ; canvas_t |] in
-  let filecons_fun : L.llvalue =
-      L.declare_function "File" filecons_t the_module in
 
   let createcons_t : L.lltype =
       L.function_type i32_t  [| canvas_t |] in
@@ -161,7 +155,6 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_fcmp L.Fcmp.Ole
         | A.Greater -> L.build_fcmp L.Fcmp.Ogt
         | A.Geq     -> L.build_fcmp L.Fcmp.Oge
-        | A.Mod     -> L.build_frem
         | _         -> raise (Failure ("illegal usage of operator " ^
           (A.string_of_op op) ^ " on float"))
         ) e1' e2' "tmp" builder
@@ -181,7 +174,6 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_icmp L.Icmp.Sle
         | A.Greater -> L.build_icmp L.Icmp.Sgt
         | A.Geq     -> L.build_icmp L.Icmp.Sge
-        | A.Mod     -> L.build_srem
         | _         -> raise (Failure ("illegal binop"))
         ) e1' e2' "tmp" builder
       | SUnop(op, ((t, _) as e)) ->
@@ -219,11 +211,6 @@ let translate (globals, functions) =
           and y' = expr builder locals y in
           L.build_call canvascons_fun [| x' ; y' |]
               "Canvas" builder
-      | SCall("File", [filename;canvas]) ->
-          let filename' = expr builder locals filename
-          and canvas' = expr builder locals canvas in
-          L.build_call filecons_fun [| filename' ; canvas' |]
-              "File" builder
       | SCall("create", [canvas]) ->
           let canvas' = expr builder locals canvas in
           L.build_call createcons_fun [| canvas' |]
