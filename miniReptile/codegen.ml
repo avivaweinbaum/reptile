@@ -48,21 +48,6 @@ let translate (globals, functions) =
   let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
 
-  (* let rgbcons_t : L.lltype =
-      L.function_type rgb_t [| i32_t ; i32_t; i32_t |] in
-  let rgbcons_fun : L.llvalue =
-      L.declare_function "Rgb" rgbcons_t the_module in *)
-
-  (* let getR_rgb_cons_t : L.lltype =
-      L.function_type i32_t [| rgb_t;|] in
-  let getR_rgb_cons_fun : L.llvalue =
-      L.declare_function "getR_rgb" getR_rgb_cons_t the_module in
-
-  let setR_rgb_cons_t : L.lltype =
-      L.function_type rgb_t [| rgb_t; i32_t;|] in
-  let setR_rgb_cons_fun : L.llvalue =
-      L.declare_function "setR_rgb" setR_rgb_cons_t the_module in *)
-
   let ptrcons_t : L.lltype =
       L.function_type pointer_t [| i32_t ; i32_t ; rgb_t ; float_t |] in
   let ptrcons_fun : L.llvalue =
@@ -256,15 +241,6 @@ let translate (globals, functions) =
         and y' = expr builder locals y in
         L.build_call pixelcons_fun [| can';color';x';y' |]
             "pixel" builder
-      (* | SCall("getR_rgb", [rgb;]) ->
-        let rgb' = expr builder locals rgb in
-        L.build_call getR_rgb_cons_fun [| rgb' |]
-            "getR_rgb" builder
-      | SCall("setR_rgb", [rgb; r_new]) ->
-        let rgb' = expr builder locals rgb 
-        and r_new' = expr builder locals r_new in
-        L.build_call setR_rgb_cons_fun [| rgb'; r_new' |]
-            "setR_rgb" builder *)
       | SCall ("get_rgb_r", [rgb;]) ->
         let build_t : L.lltype = 
           L.function_type i32_t [|rgb_t;|] in 
@@ -300,13 +276,13 @@ let translate (globals, functions) =
               L.declare_function "get_pointer_y" build_t the_module in
           L.build_call build_func [| expr builder locals pointer|]
             "get_pointer_y" builder
-      | SCall ("set_pointer_xy", [pointer;x;y]) ->
+      (* | SCall ("set_pointer_xy", [pointer;x;y]) ->
         let build_t : L.lltype = 
           L.function_type pointer_t [|pointer_t;i32_t;i32_t|] in 
             let build_func : L.llvalue = 
               L.declare_function "set_pointer_xy" build_t the_module in
           L.build_call build_func [| expr builder locals pointer ; expr builder locals x ; expr builder locals y|]
-            "set_pointer_xy" builder
+            "set_pointer_xy" builder *)
       | SCall ("set_pointer_color", [pointer;rgb]) ->
         let build_t : L.lltype = 
           L.function_type pointer_t [|pointer_t;rgb_t|] in 

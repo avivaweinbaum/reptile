@@ -50,7 +50,7 @@ let check (globals, functions) =
       ("get_rgb_b", Int, [(Rgb, "rgb");]);
       ("get_pointer_x", Int, [(Pointer, "pointer")]);
       ("get_pointer_y", Int, [(Pointer, "pointer")]);
-      ("set_pointer_xy", Pointer, [(Pointer, "pointer"); (Int, "x"); (Int, "y")]);
+      (* ("set_pointer_xy", Pointer, [(Pointer, "pointer"); (Int, "x_new"); (Int, "y_new")]); *)
       ("set_pointer_color", Pointer, [(Pointer, "pointer"); (Rgb, "rgb")]);
       ("get_canvas_x", Int, [(Canvas, "canvas")]);
       ("get_canvas_y", Int, [(Canvas, "canvas")]);

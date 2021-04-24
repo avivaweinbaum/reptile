@@ -15,10 +15,7 @@ int main() {
     print(px);
     print(py);
 
-    /\ Pointer ptr = set_pointer_color(ptr, Rgb(10,20,10));
-    /\ Pointer ptr = set_pointer_xy(ptr, 10,20);
-    /\ print(get_pointer_x(ptr));
-    /\ print(get_pointer_y(ptr));
+    Pointer ptr = set_pointer_color(ptr, Rgb(10,20,10));
 
     return 0;
 }
