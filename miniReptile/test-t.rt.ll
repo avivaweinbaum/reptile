@@ -2,22 +2,12 @@
 source_filename = "Reptile"
 
 @fmt = private unnamed_addr constant [4 x i8] c"%d\0A\00"
-@fmt.1 = private unnamed_addr constant [4 x i8] c"%g\0A\00"
-@fmt.2 = private unnamed_addr constant [4 x i8] c"%s\0A\00"
 @str = private unnamed_addr constant [17 x i8] c"turtle_start.png\00"
+@fmt.1 = private unnamed_addr constant [4 x i8] c"%d\0A\00"
+@fmt.2 = private unnamed_addr constant [4 x i8] c"%d\0A\00"
 @fmt.3 = private unnamed_addr constant [4 x i8] c"%d\0A\00"
-@fmt.4 = private unnamed_addr constant [4 x i8] c"%g\0A\00"
-@fmt.5 = private unnamed_addr constant [4 x i8] c"%s\0A\00"
-@fmt.6 = private unnamed_addr constant [4 x i8] c"%d\0A\00"
-@fmt.7 = private unnamed_addr constant [4 x i8] c"%g\0A\00"
-@fmt.8 = private unnamed_addr constant [4 x i8] c"%s\0A\00"
-@fmt.9 = private unnamed_addr constant [4 x i8] c"%d\0A\00"
-@fmt.10 = private unnamed_addr constant [4 x i8] c"%g\0A\00"
-@fmt.11 = private unnamed_addr constant [4 x i8] c"%s\0A\00"
 
 declare i32 @printf(i8*, ...)
-
-declare { i32, i32, i32 }* @Rgb(i32, i32, i32)
 
 declare i32 @getR_rgb({ i32, i32, i32 }*)
 
@@ -209,9 +199,9 @@ entry:
   %tmp17 = sdiv i32 %run15, %gcdval16
   store i32 %tmp17, i32* %simplerun
   %simplerise18 = load i32, i32* %simplerise
-  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.9, i32 0, i32 0), i32 %simplerise18)
+  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.3, i32 0, i32 0), i32 %simplerise18)
   %simplerun19 = load i32, i32* %simplerun
-  %printf20 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.9, i32 0, i32 0), i32 %simplerun19)
+  %printf20 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.3, i32 0, i32 0), i32 %simplerun19)
   %counter = alloca i32
   store i32 0, i32* %counter
   %xcur = alloca i32
@@ -259,3 +249,5 @@ while_body:                                       ; preds = %while
 merge:                                            ; preds = %while
   ret i32 0
 }
+
+declare { i32, i32, i32 }* @Rgb(i32, i32, i32)

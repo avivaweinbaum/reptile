@@ -87,7 +87,6 @@ let check (globals, functions) =
 
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
-    (* **********DIFFERENT************* *)
     let check_assign lvaluet rvaluet err =
        if lvaluet = rvaluet then lvaluet else raise (Failure err)
     in   
@@ -121,14 +120,14 @@ let check (globals, functions) =
       | BoolLit  l -> (Bool, SBoolLit l)
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier locals s, SId s)
-      | Unop(op, e) as ex -> 
+      | Unop(op, e) -> 
           let (t, e') = expr locals e in
           let ty = match op with
             Neg when t = Int -> t
           | Not when t = Bool -> Bool
           | _ -> raise (Failure ("illegal unary operator"))
           in (ty, SUnop(op, (t, e')))
-      | Binop(e1, op, e2) as e -> 
+      | Binop(e1, op, e2) -> 
           let (t1, e1') = expr locals e1 
           and (t2, e2') = expr locals e2 in
           (* All binary operators require operands of the same type *)
@@ -144,7 +143,7 @@ let check (globals, functions) =
           | _ -> raise (
 	      Failure ("illegal binary operator "))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
-      | Call(fname, args) as call -> 
+      | Call(fname, args) -> 
           let fd = find_func fname in
           let param_length = List.length fd.formals in
           if List.length args != param_length then
@@ -170,7 +169,7 @@ let check (globals, functions) =
               Assign(v,e) as exp-> 
                    let ty = type_of_identifier map v in
                       (match e with
-                        _ -> 
+                        Fliteral _ -> 
                             let lt = StringMap.find v map
                             and (rt, e') = expr locals e in
                             let err = "illegal assignment of object field" ^ 

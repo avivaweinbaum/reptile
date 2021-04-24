@@ -22,8 +22,6 @@ let translate (globals, functions) =
   let rgb_t      = L.pointer_type(L.struct_type context [| i32_t ; i32_t; i32_t |]) in
   let pointer_t  = L.pointer_type(L.struct_type context [| i32_t ; i32_t ; rgb_t ; float_t |]) in
   let canvas_t   = L.pointer_type(L.struct_type context [| i32_t ; i32_t |]) in
-  let file_t     = L.pointer_type(L.struct_type context [| string_t ; canvas_t |])
-  in
 
  (* Return the LLVM type for a Reptile type *)
   let ltype_of_typ = function
@@ -50,10 +48,10 @@ let translate (globals, functions) =
   let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
 
-  let rgbcons_t : L.lltype =
+  (* let rgbcons_t : L.lltype =
       L.function_type rgb_t [| i32_t ; i32_t; i32_t |] in
   let rgbcons_fun : L.llvalue =
-      L.declare_function "Rgb" rgbcons_t the_module in
+      L.declare_function "Rgb" rgbcons_t the_module in *)
 
   let getR_rgb_cons_t : L.lltype =
       L.function_type i32_t [| rgb_t;|] in
@@ -141,9 +139,9 @@ let translate (globals, functions) =
     let (the_function, _) = StringMap.find fdecl.sfname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
-    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
-    and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder 
-    and str_format_str = L.build_global_stringptr "%s\n" "fmt" builder in
+    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
+    (* and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder *)
+    (* and str_format_str = L.build_global_stringptr "%s\n" "fmt" builder in *)
 
     let local_vars =
       let add_formal m (t, n) p =
@@ -162,7 +160,7 @@ let translate (globals, functions) =
     let mem_to_ind ty = match ty  with
     _ -> List.fold_left (fun m (name, ind) -> StringMap.add name ind m)
                 StringMap.empty [("r",0); ("g",1); ("b",2); ("x",0); ("y",1); 
-                ("color",2); ("angle",3); ("filename",0); ("canvas",1)]
+                ("color",2); ("angle",3); ("canvas",1)]
     in
 
 
@@ -209,7 +207,7 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_icmp L.Icmp.Sle
         | A.Greater -> L.build_icmp L.Icmp.Sgt
         | A.Geq     -> L.build_icmp L.Icmp.Sge
-        | _         -> raise (Failure ("illegal binop"))
+        (* | _         -> raise (Failure ("illegal binop")) *)
         ) e1' e2' "tmp" builder
       | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder locals e in
@@ -231,8 +229,8 @@ let translate (globals, functions) =
           let build_t : L.lltype = 
             L.function_type rgb_t [|i32_t; i32_t; i32_t;|] in 
               let build_func : L.llvalue = 
-                L.declare_function "Rgb" rgbcons_t the_module in
-          L.build_call rgbcons_fun [| expr builder locals r; expr builder locals g; expr builder locals b; |]
+                L.declare_function "Rgb" build_t the_module in
+          L.build_call build_func [| expr builder locals r; expr builder locals g; expr builder locals b; |]
               "Rgb" builder
       | SCall("Pointer", [x;y;color;angle]) ->
           let x' = expr builder locals x

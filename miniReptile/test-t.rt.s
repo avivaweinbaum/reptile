@@ -187,7 +187,7 @@ turtle_draw:                            # @turtle_draw
 	cltd
 	idivl	%ecx
 	movl	%eax, -20(%rbp)
-	leaq	.Lfmt.9(%rip), %rbx
+	leaq	.Lfmt.3(%rip), %rbx
 	xorl	%eax, %eax
 	movq	%rbx, %rdi
 	callq	printf@PLT
@@ -247,16 +247,6 @@ turtle_draw:                            # @turtle_draw
 	.asciz	"%d\n"
 	.size	.Lfmt, 4
 
-	.type	.Lfmt.1,@object         # @fmt.1
-.Lfmt.1:
-	.asciz	"%g\n"
-	.size	.Lfmt.1, 4
-
-	.type	.Lfmt.2,@object         # @fmt.2
-.Lfmt.2:
-	.asciz	"%s\n"
-	.size	.Lfmt.2, 4
-
 	.type	.Lstr,@object           # @str
 	.section	.rodata.str1.16,"aMS",@progbits,1
 	.p2align	4
@@ -264,51 +254,21 @@ turtle_draw:                            # @turtle_draw
 	.asciz	"turtle_start.png"
 	.size	.Lstr, 17
 
-	.type	.Lfmt.3,@object         # @fmt.3
+	.type	.Lfmt.1,@object         # @fmt.1
 	.section	.rodata.str1.1,"aMS",@progbits,1
+.Lfmt.1:
+	.asciz	"%d\n"
+	.size	.Lfmt.1, 4
+
+	.type	.Lfmt.2,@object         # @fmt.2
+.Lfmt.2:
+	.asciz	"%d\n"
+	.size	.Lfmt.2, 4
+
+	.type	.Lfmt.3,@object         # @fmt.3
 .Lfmt.3:
 	.asciz	"%d\n"
 	.size	.Lfmt.3, 4
-
-	.type	.Lfmt.4,@object         # @fmt.4
-.Lfmt.4:
-	.asciz	"%g\n"
-	.size	.Lfmt.4, 4
-
-	.type	.Lfmt.5,@object         # @fmt.5
-.Lfmt.5:
-	.asciz	"%s\n"
-	.size	.Lfmt.5, 4
-
-	.type	.Lfmt.6,@object         # @fmt.6
-.Lfmt.6:
-	.asciz	"%d\n"
-	.size	.Lfmt.6, 4
-
-	.type	.Lfmt.7,@object         # @fmt.7
-.Lfmt.7:
-	.asciz	"%g\n"
-	.size	.Lfmt.7, 4
-
-	.type	.Lfmt.8,@object         # @fmt.8
-.Lfmt.8:
-	.asciz	"%s\n"
-	.size	.Lfmt.8, 4
-
-	.type	.Lfmt.9,@object         # @fmt.9
-.Lfmt.9:
-	.asciz	"%d\n"
-	.size	.Lfmt.9, 4
-
-	.type	.Lfmt.10,@object        # @fmt.10
-.Lfmt.10:
-	.asciz	"%g\n"
-	.size	.Lfmt.10, 4
-
-	.type	.Lfmt.11,@object        # @fmt.11
-.Lfmt.11:
-	.asciz	"%s\n"
-	.size	.Lfmt.11, 4
 
 
 	.section	".note.GNU-stack","",@progbits

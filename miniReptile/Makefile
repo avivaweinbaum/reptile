@@ -8,7 +8,7 @@ test : all testall.sh
 # to test linking external code
 
 .PHONY : all
-all : reptile.native rgb canvas file pointer png pixelator trig # printbig.o
+all : reptile.native rgb canvas pointer png pixelator trig# printbig.o
 
 # "make reptile.native" compiles the compiler
 #
@@ -38,9 +38,6 @@ rgb : rgb.c
 
 canvas: canvas.c
 	gcc -c canvas.c -lm
-
-file: file.c
-	gcc -c file.c -lm
 
 pointer: pointer.c
 	gcc -c pointer.c -lm

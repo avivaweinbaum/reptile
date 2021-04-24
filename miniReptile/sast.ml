@@ -12,7 +12,7 @@ and sx =
   | SFliteral of string
   | SSliteral of string
   | SId of string
-  | SString of string
+  (* | SString of string *)
   | SCall of string * sexpr list
   | SAssign of string * sexpr
   (* | SListAccess of string * sexpr
@@ -49,6 +49,7 @@ let rec string_of_sexpr (t, e) =
   | SBoolLit(true) -> "true"
   | SBoolLit(false) -> "false"
   | SId(s) -> s
+  (* | SString(s) -> s *)
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
   | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e
