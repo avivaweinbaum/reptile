@@ -22,8 +22,6 @@ let translate (globals, functions) =
   let rgb_t      = L.pointer_type(L.struct_type context [| i32_t ; i32_t; i32_t |]) in
   let pointer_t  = L.pointer_type(L.struct_type context [| i32_t ; i32_t ; rgb_t ; float_t |]) in
   let canvas_t   = L.pointer_type(L.struct_type context [| i32_t ; i32_t |]) in
-  let file_t     = L.pointer_type(L.struct_type context [| string_t ; canvas_t |])
-  in
 
  (* Return the LLVM type for a Reptile type *)
   let ltype_of_typ = function
@@ -127,7 +125,7 @@ let translate (globals, functions) =
     let mem_to_ind ty = match ty  with
     _ -> List.fold_left (fun m (name, ind) -> StringMap.add name ind m)
                 StringMap.empty [("r",0); ("g",1); ("b",2); ("x",0); ("y",1); 
-                ("color",2); ("angle",3); ("filename",0); ("canvas",1)]
+                ("color",2); ("angle",3); ("canvas",1)]
     in
 
 
