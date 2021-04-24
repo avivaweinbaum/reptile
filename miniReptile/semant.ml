@@ -138,7 +138,7 @@ let check (globals, functions) =
           | Add | Sub | Mul | Div when t1 = Float || t2 = Float -> Float
           | Equal | Neq            when same               -> Bool
           | Less | Leq | Greater | Geq
-                     when same && (t1 = Int) -> Bool
+                     when same && ((t1 = Int) || (t1 = Float)) -> Bool
           | And | Or when same && t1 = Bool -> Bool
           | _ -> raise (
 	      Failure ("illegal binary operator "))

@@ -1,0 +1,114 @@
+int xcur;
+int ycur;
+
+
+int tortup(Canvas can, Rgb color, int distance) {
+    int counter = 0;
+    while(counter < distance) {
+        pixel(can, color, xcur, ycur-counter);
+        counter = counter + 1;
+    }
+    ycur = ycur - distance;
+    return 0;
+}
+
+int tortdown(Canvas can, Rgb color, int distance) {
+    int counter = 0;
+    while(counter < distance) {
+        pixel(can, color, xcur, ycur+counter);
+        counter = counter + 1;
+    }
+    ycur = ycur + distance;
+    return 0;
+}
+
+int tortright(Canvas can, Rgb color, int distance) {
+    int counter = 0;
+    while(counter < distance) {
+        pixel(can, color, xcur+counter, ycur);
+        counter = counter + 1;
+    }
+    xcur = xcur + distance;
+    return 0;
+}
+
+int tortleft(Canvas can, Rgb color, int distance) {
+    int counter = 0;
+    while(counter < distance) {
+        pixel(can, color, xcur-counter, ycur);
+        counter = counter + 1;
+    }
+    xcur = xcur - distance;
+    return 0;
+}
+
+int tortNW(Canvas can, Rgb color, float distance) {
+    int counter = 0;
+    float counter1 = 0.0;
+    float step = distance * 0.707;
+    while(counter1 < step) {
+        pixel(can, color, xcur-counter, ycur-counter);
+        counter1 = counter1 + 1.0;
+        counter = counter + 1;
+    }
+    xcur = xcur - counter;
+    ycur = ycur - counter;
+    return 0;
+}
+
+int tortNE(Canvas can, Rgb color, float distance) {
+    int counter = 0;
+    float counter1 = 0.0;
+    float step = distance * 0.707;
+    while(counter1 < step) {
+        pixel(can, color, xcur+counter, ycur-counter);
+        counter1 = counter1 + 1.0;
+        counter = counter + 1;
+    }
+    xcur = xcur + counter;
+    ycur = ycur - counter;
+    return 0;
+}
+
+int tortSW(Canvas can, Rgb color, float distance) {
+    int counter = 0;
+    float counter1 = 0.0;
+    float step = distance * 0.707;
+    while(counter1 < step) {
+        pixel(can, color, xcur-counter, ycur+counter);
+        counter1 = counter1 + 1.0;
+        counter = counter + 1;
+    }
+    xcur = xcur - counter;
+    ycur = ycur + counter;
+    return 0;
+}
+
+int tortSE(Canvas can, Rgb color, float distance) {
+    int counter = 0;
+    float counter1 = 0.0;
+    float step = distance * 0.707;
+    while(counter1 < step) {
+        pixel(can, color, xcur+counter, ycur+counter);
+        counter1 = counter1 + 1.0;
+        counter = counter + 1;
+    }
+    xcur = xcur + counter;
+    ycur = ycur + counter;
+    return 0;
+}
+
+
+int main() {
+    Canvas can = Canvas(500, 500);
+    Rgb color = Rgb(0,0,0);
+    xcur = 100;
+    ycur = 100;
+    tortright(can, color, 100);
+    tortdown(can, color, 100);
+    tortleft(can, color, 100);
+    tortup(can, color, 100);
+    tortNW(can, color, 200.0);
+    save(can, "simple_turtle_start.png");
+    return 0;
+}
