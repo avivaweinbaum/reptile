@@ -45,8 +45,15 @@ let check (globals, functions) =
       ("create", Void, [(Canvas, "canvas")]);
       ("save", Void, [(Canvas, "can"); (String, "filename")]); 
       ("pixel", Canvas, [(Canvas, "can"); (Rgb, "color"); (Int, "x"); (Int, "y")]);
-      ("getR_rgb", Int, [(Rgb, "rgb");]);
-      ("setR_rgb", Rgb, [(Rgb, "rgb"); (Int, "r_new");]);
+      ("get_rgb_r", Int, [(Rgb, "rgb");]);
+      ("get_rgb_g", Int, [(Rgb, "rgb");]);
+      ("get_rgb_b", Int, [(Rgb, "rgb");]);
+      ("get_pointer_x", Int, [(Pointer, "pointer")]);
+      ("get_pointer_y", Int, [(Pointer, "pointer")]);
+      (* ("set_pointer_xy", Pointer, [(Pointer, "pointer"); (Int, "x_new"); (Int, "y_new")]); *)
+      ("set_pointer_color", Pointer, [(Pointer, "pointer"); (Rgb, "rgb")]);
+      ("get_canvas_x", Int, [(Canvas, "canvas")]);
+      ("get_canvas_y", Int, [(Canvas, "canvas")]);
       ("sine", Float, [(Float, "angle");]);
       ("cosine", Float, [(Float, "angle");]);
       ("tangeant", Float, [(Float, "angle");]);

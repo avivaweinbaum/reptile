@@ -9,10 +9,6 @@ source_filename = "Reptile"
 
 declare i32 @printf(i8*, ...)
 
-declare i32 @getR_rgb({ i32, i32, i32 }*)
-
-declare { i32, i32, i32 }* @setR_rgb({ i32, i32, i32 }*, i32)
-
 declare { i32, i32, { i32, i32, i32 }*, double }* @Pointer(i32, i32, { i32, i32, i32 }*, double)
 
 declare { i32, i32 }* @Canvas(i32, i32)
