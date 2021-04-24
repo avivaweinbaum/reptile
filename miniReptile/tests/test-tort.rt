@@ -1,0 +1,63 @@
+int turtle_draw(Canvas can, float angle, int distance, Rgb color, int x, int y) {
+    int rise = getRise(distance, angle);
+    int run = getRun(distance, angle);
+    int gcdval = gcd(rise, run);
+    
+    
+
+    int simplerise = rise/gcdval;
+    int simplerun = run/gcdval;
+
+    print(simplerise); 
+    print(simplerun);
+
+    int counter = 0;
+    int xcur = x;
+    int ycur = y;
+    while (ycur < y+rise || xcur < x+run) {
+        int z = step(can, simplerise, simplerun, xcur, ycur, color);
+        xcur = xcur + simplerun;
+        ycur = ycur + simplerise;
+    }
+    return 0;
+
+}
+
+int step(Canvas can, int rise, int run, int x, int y, Rgb color) {
+    int xcount = 0;
+    int ycount = 0;
+    int xcur = x;
+    int ycur = y;
+    while (xcount < run) {
+        pixel(can, color, xcur, ycur);
+        xcur = xcur + 1;
+        xcount = xcount + 1;
+    }
+    while (ycount < rise) {
+        pixel(can, color, xcur, ycur);
+        ycur = ycur + 1;
+        ycount = ycount + 1;
+    }
+    return 0;
+}
+
+
+int gcd(int a, int b) {
+    if (b != 0) {
+        return gcd(b, mod(a, b));
+    }
+    else {
+        return a;
+    }
+}
+
+int main() {
+    int test = gcd(366, 60);
+    Canvas can = Canvas(500, 500);
+    Rgb color = Rgb(0,0,0);
+    turtle_draw(can, 0.0, 100, color, 100, 100);
+    turtle_draw(can, 90.0, 100, color, 200, 100);
+    turtle_draw(can, 270.0, 100, color, 100, 200);
+    save(can, "turtle_start.png");
+    return 0;
+}

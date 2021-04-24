@@ -47,6 +47,13 @@ let check (globals, functions) =
       ("pixel", Canvas, [(Canvas, "can"); (Rgb, "color"); (Int, "x"); (Int, "y")]);
       ("getR_rgb", Int, [(Rgb, "rgb");]);
       ("setR_rgb", Rgb, [(Rgb, "rgb"); (Int, "r_new");]);
+      ("sine", Float, [(Float, "angle");]);
+      ("cosine", Float, [(Float, "angle");]);
+      ("tangeant", Float, [(Float, "angle");]);
+      ("mod", Int, [(Int, "val1"); (Int, "val2");]);
+      ("floors", Int, [(Float, "val");]);
+      ("getRise", Int, [(Int, "distance"); (Float, "angle");]);
+      ("getRun", Int, [(Int, "distance"); (Float, "angle");])
       ];
   in
 
@@ -129,6 +136,7 @@ let check (globals, functions) =
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div when t1 = Float || t2 = Float -> Float
           | Equal | Neq            when same               -> Bool
           | Less | Leq | Greater | Geq
                      when same && (t1 = Int) -> Bool

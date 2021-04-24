@@ -8,7 +8,7 @@ test : all testall.sh
 # to test linking external code
 
 .PHONY : all
-all : reptile.native rgb canvas file pointer png pixelator # printbig.o
+all : reptile.native rgb canvas file pointer png pixelator trig # printbig.o
 
 # "make reptile.native" compiles the compiler
 #
@@ -34,22 +34,25 @@ clean :
 #	cc -o printbig -DBUILD_TEST printbig.c
 
 rgb : rgb.c
-	gcc -c rgb.c
+	gcc -c rgb.c -lm
 
 canvas: canvas.c
-	gcc -c canvas.c
+	gcc -c canvas.c -lm
 
 file: file.c
-	gcc -c file.c
+	gcc -c file.c -lm
 
 pointer: pointer.c
-	gcc -c pointer.c
+	gcc -c pointer.c -lm
 
 png: png.c
-	gcc -c png.c
+	gcc -c png.c -lm
 
 pixelator: pixelator.c
-	gcc -c pixelator.c
+	gcc -c pixelator.c -lm
+
+trig: trig.c
+	gcc -c trig.c -lm
 
 # Building the tarball
 

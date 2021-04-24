@@ -90,6 +90,41 @@ let translate (globals, functions) =
   let pixelcons_fun : L.llvalue =
       L.declare_function "pixel" pixelcons_t the_module in
 
+  let sinecons_t : L.lltype = 
+      L.function_type float_t [|float_t;|] in
+  let sinecons_fun : L.llvalue = 
+      L.declare_function "sine" sinecons_t the_module in
+
+  let cosinecons_t : L.lltype = 
+      L.function_type float_t [|float_t;|] in
+  let cosinecons_fun : L.llvalue = 
+      L.declare_function "cosine" cosinecons_t the_module in
+
+  let tangeantcons_t : L.lltype = 
+      L.function_type float_t [|float_t;|] in
+  let tangeantcons_fun : L.llvalue = 
+      L.declare_function "tangeant" tangeantcons_t the_module in
+
+  let modcons_t : L.lltype =
+      L.function_type i32_t [|i32_t; i32_t;|] in
+  let modcons_fun : L.llvalue = 
+      L.declare_function "mod" modcons_t the_module in
+
+  let floorscons_t : L.lltype = 
+      L.function_type i32_t [|float_t;|] in
+  let floorscons_fun : L.llvalue = 
+      L.declare_function "floors" floorscons_t the_module in
+
+  let getRuncons_t : L.lltype = 
+      L.function_type i32_t [|i32_t; float_t;|] in
+  let getRuncons_fun : L.llvalue = 
+      L.declare_function "getRun" getRuncons_t the_module in
+
+  let getRisecons_t : L.lltype = 
+      L.function_type i32_t [|i32_t; float_t;|] in
+  let getRisecons_fun : L.llvalue = 
+      L.declare_function "getRise" getRisecons_t the_module in
+
  (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -236,6 +271,37 @@ let translate (globals, functions) =
         and r_new' = expr builder locals r_new in
         L.build_call setR_rgb_cons_fun [| rgb'; r_new' |]
             "setR_rgb" builder
+      | SCall ("sine", [angle;]) ->
+        let angle' = expr builder locals angle in
+        L.build_call sinecons_fun [| angle';|]
+            "sine" builder
+      | SCall ("cosine", [angle;]) ->
+        let angle' = expr builder locals angle in
+        L.build_call cosinecons_fun [| angle';|]
+            "cosine" builder
+      | SCall ("tangeant", [angle;]) ->
+        let angle' = expr builder locals angle in
+        L.build_call tangeantcons_fun [| angle';|]
+            "tangeant" builder
+      | SCall ("mod", [val1; val2;]) ->
+        let val1' = expr builder locals val1 
+        and val2' = expr builder locals val2 in
+        L.build_call modcons_fun [|val1';val2'|]
+            "mod" builder
+      | SCall ("floors", [val1;]) ->
+        let val1' = expr builder locals val1 in
+        L.build_call floorscons_fun [|val1';|]
+            "floors" builder
+      | SCall ("getRise", [distance;angle;]) ->
+        let distance' = expr builder locals distance 
+        and angle' = expr builder locals angle in
+        L.build_call getRisecons_fun [|distance';angle';|]
+            "getRise" builder
+      | SCall ("getRun", [distance;angle;]) ->
+        let distance' = expr builder locals distance 
+        and angle' = expr builder locals angle in
+        L.build_call getRuncons_fun [|distance';angle';|]
+            "getRun" builder
       | SCall (fname, args) ->
         let (ldev, sfd) = StringMap.find fname function_decls in
         let actuals = List.rev (List.map (fun e -> expr builder locals e)
