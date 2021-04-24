@@ -1,0 +1,24 @@
+int main() {
+    Canvas can = Canvas(100,200);
+    print(get_canvas_x(can));
+    print(get_canvas_y(can));
+
+    Rgb color = Rgb(1,2,3); 
+    int r = get_rgb_r(color);
+    print(get_rgb_r(color));
+    print(get_rgb_g(color));
+    print(get_rgb_b(color));
+
+    Pointer ptr = Pointer(4,5,color,5.5);
+    int px = get_pointer_x(ptr);
+    int py = get_pointer_y(ptr);
+    print(px);
+    print(py);
+
+    /\ Pointer ptr = set_pointer_color(ptr, Rgb(10,20,10));
+    /\ Pointer ptr = set_pointer_xy(ptr, 10,20);
+    /\ print(get_pointer_x(ptr));
+    /\ print(get_pointer_y(ptr));
+
+    return 0;
+}

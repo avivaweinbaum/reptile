@@ -9,12 +9,12 @@ typedef struct rgb {
     int b;
 } rgb;
 
-struct pointer {
+typedef struct pointer {
     int x;
     int y;
     struct rgb color;
     float angle;
-};
+} pointer;
 
 struct canvas {
     int x;

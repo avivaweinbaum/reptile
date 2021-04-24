@@ -10,13 +10,6 @@ struct Canvas {
     libattopng_t *png;
 };
 
-// struct Canvas* Canvas(int x, int y) {
-//     struct Canvas* can = malloc(sizeof(struct Canvas));    
-//     can->x = x;
-//     can->y = y;
-//     return can;
-// }
-
 struct canvas* Canvas(int x, int y) {
     struct canvas *can = malloc(sizeof(struct canvas));    
     can->x = x;
@@ -25,6 +18,10 @@ struct canvas* Canvas(int x, int y) {
     return can;
 }
 
-// void destroy_canvas (struct canvas* this) {
-//     libattopng_destroy(this->png);
-// }
+int get_canvas_x(struct canvas* canvas) {
+    return canvas->x;
+}
+
+int get_canvas_y(struct canvas* canvas) {
+    return canvas->y;
+}
