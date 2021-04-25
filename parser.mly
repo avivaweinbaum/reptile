@@ -9,10 +9,9 @@ open Ast
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LSQUARE RSQUARE 
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token TRUE FALSE
-%token MOD
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token INT STRING VOID BOOL FLOAT
-%token RGB CANVAS POINTER FILE
+%token RGB CANVAS POINTER
 %token RETURN WHILE
 %token RETURN IF ELSE
 %token <int> LITERAL
@@ -31,7 +30,7 @@ open Ast
 %left EQ NEQ
 %left LT GT LEQ GEQ
 %left PLUS MINUS
-%left TIMES DIVIDE MOD
+%left TIMES DIVIDE
 %left EXP
 %right NOT
 
@@ -76,9 +75,7 @@ typ:
   | FLOAT { Float }
   | RGB { Rgb }
   | CANVAS { Canvas }
-  // | LIST typ LSQUARE LITERAL RSQUARE { List($2, $4) }
   | POINTER { Pointer }
-  | FILE { File }
 
 stmt_list:
     /* nothing */  { [] }
@@ -101,7 +98,7 @@ expr:
     LITERAL          { Literal($1)            }
   | BLIT             { BoolLit($1)            }
   | FLIT             { Fliteral($1)           }
-  // | SLIT             { String($1)             }
+  | SLIT             { Sliteral($1)             }
   | ID               { Id($1) }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
@@ -115,16 +112,12 @@ expr:
   | expr GEQ    expr { Binop($1, Geq,   $3)   }
   | expr AND    expr { Binop($1, And,   $3)   }
   | expr OR     expr { Binop($1, Or,    $3)   }
-  // | expr EXP    expr { Binop($1, Exp,   $3)   }
-  | expr MOD    expr { Binop($1, Mod,   $3)   }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | typ LPAREN args_opt RPAREN        { Call((string_of_typ $1), $3) }
   | LPAREN expr RPAREN { $2                   }
-  // | ID LSQUARE expr RSQUARE { ListAccess($1, $3) }
-  // | LSQUARE args_list RSQUARE { ListLit(List.rev $2) }
 
 args_opt:
     /* nothing */ { [] }
