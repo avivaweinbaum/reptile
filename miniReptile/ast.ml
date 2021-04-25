@@ -20,7 +20,6 @@ type expr =
   | Id of string
   | Call of string * expr list
   | Assign of string * expr
-  | Access of string * expr
   | Noexpr
 
 type stmt =
@@ -85,7 +84,6 @@ let rec string_of_expr = function
 | Call(f, el) ->
   f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
 | Assign(v, e) -> v ^ " = " ^ string_of_expr e
-| Access(id, e) -> id ^ "." ^ string_of_expr e
 | Noexpr -> ""
 
 let rec string_of_stmt = function
@@ -99,7 +97,6 @@ Block(stmts) ->
 | If(e, s, Block([])) -> "if (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
 | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
       string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
-
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

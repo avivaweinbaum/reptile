@@ -120,8 +120,6 @@ let translate (globals, functions) =
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
-    (* and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder *)
-    (* and str_format_str = L.build_global_stringptr "%s\n" "fmt" builder in *)
 
     let local_vars =
       let add_formal m (t, n) p =
@@ -136,13 +134,6 @@ let translate (globals, functions) =
     let lookup n locals = try StringMap.find n locals
                    with Not_found -> StringMap.find n global_vars
     in
-
-    let mem_to_ind ty = match ty  with
-    _ -> List.fold_left (fun m (name, ind) -> StringMap.add name ind m)
-                StringMap.empty [("r",0); ("g",1); ("b",2); ("x",0); ("y",1); 
-                ("color",2); ("angle",3); ("canvas",1)]
-    in
-
 
     (* Construct code for an expression; return its value *)
     let rec expr builder locals ((_, e) : sexpr) = match e with
@@ -187,7 +178,6 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_icmp L.Icmp.Sle
         | A.Greater -> L.build_icmp L.Icmp.Sgt
         | A.Geq     -> L.build_icmp L.Icmp.Sge
-        | _         -> raise (Failure ("illegal binop"))
         ) e1' e2' "tmp" builder
       | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder locals e in
@@ -343,23 +333,6 @@ let translate (globals, functions) =
             A.Void -> ""
           | _-> fname^"_ret") in
         L.build_call ldev (Array.of_list actuals) ret builder
-      | SAccess(id,sx) ->
-          let getI t n = 
-            try StringMap.find n (mem_to_ind t) 
-            with Not_found -> raise(Failure("member not found"))in
-          let getNextVal o t n = L.build_struct_gep o (getI t n) n builder in
-          let rec eval out t = function
-              SAccess(sid, sf)-> eval (getNextVal out t sid) 
-                  (L.type_of(getNextVal out t sid)) (snd sf)  
-            | SId sid -> 
-                    let ref = L.build_struct_gep out (getI t sid) sid builder in
-                    L.build_load ref sid builder
-            | SAssign(s,e) -> 
-                  let ref = L.build_struct_gep out (getI t s) s builder in
-                  let e' =  expr builder locals e in
-                  ignore(L.build_store e' ref builder); e'
-            | _ -> raise(Failure("invalid field usage"))
-          in eval (lookup id locals) (L.type_of (lookup id locals)) (snd sx)
     in
 
  (* LLVM insists each basic block end with exactly one "terminator"
