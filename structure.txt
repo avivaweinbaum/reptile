@@ -1,0 +1,26 @@
+Canvas constructor
+- creating the png object here and storing it in the Canvas
+- canvas C struct has x, y, png
+- Canvas rt struct has x, y
+- in Canvas(int x, int y) function we create the png using C library (create_new) and return the Reptile Canvas object
+
+get rid of file struct
+
+pixel function -- pixel(canvas, x, y)
+
+C struct files: constructors, access methods, mutator methods
+Pixelator: all other static built-in functions
+
+Tortoise --
+    - pointer  start x and y , angle
+    - draw 40 pixels 
+    ex) pointer Point = Pointer(x, y, angle)
+        draw(canvas, pointer, 80)
+
+Access
+    - RGB
+    - Pointer
+
+
+Save(Canvas, string for filename) function
+-Here we save and destroy using libbatopng functions

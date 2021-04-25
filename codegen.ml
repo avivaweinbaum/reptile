@@ -17,12 +17,11 @@ let translate (globals, functions) =
   and i8_t       = L.i8_type     context
   and i1_t       = L.i1_type     context
   and void_t     = L.void_type   context
-  and float_t    = L.double_type context in
-  let rgb_t      = L.struct_type context [| i32_t ; i32_t; i32_t |] in
-  let pointer_t  = L.struct_type context [| i32_t ; i32_t ; rgb_t ; float_t |] in
-  let canvas_t   = L.struct_type context [| i32_t ; i32_t |] in
-  let file_t     = L.struct_type context [| i1_t ; canvas_t |]
-  in
+  and float_t    = L.double_type context
+  and string_t   = L.pointer_type (L.i8_type context) in
+  let rgb_t      = L.pointer_type(L.struct_type context [| i32_t ; i32_t; i32_t |]) in
+  let pointer_t  = L.pointer_type(L.struct_type context [| i32_t ; i32_t ; rgb_t ; float_t |]) in
+  let canvas_t   = L.pointer_type(L.struct_type context [| i32_t ; i32_t |]) in
 
  (* Return the LLVM type for a Reptile type *)
   let ltype_of_typ = function
@@ -30,10 +29,10 @@ let translate (globals, functions) =
     | A.Bool  -> i1_t
     | A.Void  -> void_t
     | A.Float -> float_t
+    | A.String -> string_t
     | A.Rgb -> rgb_t
     | A.Pointer -> pointer_t
     | A.Canvas -> canvas_t
-    | A.File -> file_t
   in
 
   let global_vars : L.llvalue StringMap.t =
@@ -49,25 +48,60 @@ let translate (globals, functions) =
   let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
 
-  let rgbcons_t : L.lltype =
-      L.function_type rgb_t [| i32_t ; i32_t; i32_t |] in
-  let rgbcons_fun : L.llvalue =
-      L.declare_function "Rgb" rgbcons_t the_module in
-
   let ptrcons_t : L.lltype =
-      L.function_type pointer_t [| float_t ; float_t ; rgb_t ; float_t |] in
+      L.function_type pointer_t [| i32_t ; i32_t ; rgb_t ; float_t |] in
   let ptrcons_fun : L.llvalue =
       L.declare_function "Pointer" ptrcons_t the_module in
 
   let canvascons_t : L.lltype =
-      L.function_type canvas_t  [| float_t ; float_t |]  in
+      L.function_type canvas_t  [| i32_t ; i32_t |]  in
   let canvascons_fun : L.llvalue =
       L.declare_function "Canvas" canvascons_t the_module in
 
-  let filecons_t : L.lltype =
-      L.function_type file_t  [| i1_t ; canvas_t |] in
-  let filecons_fun : L.llvalue =
-      L.declare_function "File" filecons_t the_module in
+  let savecons_t : L.lltype =
+      L.function_type i32_t  [| canvas_t ; string_t |] in
+  let savecons_fun : L.llvalue =
+      L.declare_function "save" savecons_t the_module in
+
+  let pixelcons_t : L.lltype =
+      L.function_type canvas_t  [| canvas_t ; rgb_t; i32_t ; i32_t |] in
+  let pixelcons_fun : L.llvalue =
+      L.declare_function "pixel" pixelcons_t the_module in
+
+  let sinecons_t : L.lltype = 
+      L.function_type float_t [|float_t;|] in
+  let sinecons_fun : L.llvalue = 
+      L.declare_function "sine" sinecons_t the_module in
+
+  let cosinecons_t : L.lltype = 
+      L.function_type float_t [|float_t;|] in
+  let cosinecons_fun : L.llvalue = 
+      L.declare_function "cosine" cosinecons_t the_module in
+
+  let tangeantcons_t : L.lltype = 
+      L.function_type float_t [|float_t;|] in
+  let tangeantcons_fun : L.llvalue = 
+      L.declare_function "tangeant" tangeantcons_t the_module in
+
+  let modcons_t : L.lltype =
+      L.function_type i32_t [|i32_t; i32_t;|] in
+  let modcons_fun : L.llvalue = 
+      L.declare_function "mod" modcons_t the_module in
+
+  let floorscons_t : L.lltype = 
+      L.function_type i32_t [|float_t;|] in
+  let floorscons_fun : L.llvalue = 
+      L.declare_function "floors" floorscons_t the_module in
+
+  let getRuncons_t : L.lltype = 
+      L.function_type i32_t [|i32_t; float_t;|] in
+  let getRuncons_fun : L.llvalue = 
+      L.declare_function "getRun" getRuncons_t the_module in
+
+  let getRisecons_t : L.lltype = 
+      L.function_type i32_t [|i32_t; float_t;|] in
+  let getRisecons_fun : L.llvalue = 
+      L.declare_function "getRise" getRisecons_t the_module in
 
  (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
@@ -85,9 +119,7 @@ let translate (globals, functions) =
     let (the_function, _) = StringMap.find fdecl.sfname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
-    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
-    and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder 
-    and str_format_str = L.build_global_stringptr "%s\n" "fmt" builder in
+    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
 
     let local_vars =
       let add_formal m (t, n) p =
@@ -107,6 +139,7 @@ let translate (globals, functions) =
     let rec expr builder locals ((_, e) : sexpr) = match e with
         SLiteral i  -> L.const_int i32_t i
       | SFliteral f -> L.const_float_of_string float_t f
+      | SSliteral s -> L.build_global_stringptr s "str" builder
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s locals) s builder
@@ -126,7 +159,6 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_fcmp L.Fcmp.Ole
         | A.Greater -> L.build_fcmp L.Fcmp.Ogt
         | A.Geq     -> L.build_fcmp L.Fcmp.Oge
-        | A.Mod     -> L.build_frem
         | _         -> raise (Failure ("illegal usage of operator " ^
           (A.string_of_op op) ^ " on float"))
         ) e1' e2' "tmp" builder
@@ -146,8 +178,6 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_icmp L.Icmp.Sle
         | A.Greater -> L.build_icmp L.Icmp.Sgt
         | A.Geq     -> L.build_icmp L.Icmp.Sge
-        | A.Mod     -> L.build_srem
-        | _         -> raise (Failure ("illegal binop"))
         ) e1' e2' "tmp" builder
       | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder locals e in
@@ -159,11 +189,13 @@ let translate (globals, functions) =
       | SCall ("print", [e]) ->
           L.build_call printf_func [| int_format_str ; (expr builder locals e) |]
           "printf" builder
-      | SCall("Rgb", [r;g;b]) ->
-          let r' = expr builder locals r
-          and g' = expr builder locals g
-          and b' = expr builder locals b in
-          L.build_call rgbcons_fun [| r' ; g' ; b' |]
+      | SCall ("Rgb", [r;g;b]) ->
+          let build_t : L.lltype = 
+            L.function_type rgb_t [|i32_t; i32_t; i32_t;|] in 
+              let build_func : L.llvalue = 
+                L.declare_function "Rgb" build_t the_module in
+          L.build_call build_func [| expr builder locals r; 
+                expr builder locals g; expr builder locals b; |]
               "Rgb" builder
       | SCall("Pointer", [x;y;color;angle]) ->
           let x' = expr builder locals x
@@ -177,11 +209,105 @@ let translate (globals, functions) =
           and y' = expr builder locals y in
           L.build_call canvascons_fun [| x' ; y' |]
               "Canvas" builder
-      | SCall("File", [filename;canvas]) ->
-          let filename' = expr builder locals filename
-          and canvas' = expr builder locals canvas in
-          L.build_call filecons_fun [| filename' ; canvas' |]
-              "File" builder
+      | SCall("save", [can;filename]) ->
+          let can' = expr builder locals can
+          and filename' = expr builder locals filename in
+          L.build_call savecons_fun [| can' ; filename' |]
+              "save" builder
+      | SCall("pixel", [can;color;x;y]) ->
+        let can' = expr builder locals can
+        and color' = expr builder locals color
+        and x' = expr builder locals x
+        and y' = expr builder locals y in
+        L.build_call pixelcons_fun [| can';color';x';y' |]
+            "pixel" builder
+      | SCall ("get_rgb_r", [rgb;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|rgb_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_rgb_r" build_t the_module in
+          L.build_call build_func [| expr builder locals rgb|]
+            "get_rgb_r" builder
+      | SCall ("get_rgb_g", [rgb;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|rgb_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_rgb_g" build_t the_module in
+          L.build_call build_func [| expr builder locals rgb|]
+            "get_rgb_g" builder
+      | SCall ("get_rgb_b", [rgb;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|rgb_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_rgb_b" build_t the_module in
+          L.build_call build_func [| expr builder locals rgb|]
+            "get_rgb_b" builder
+      | SCall ("get_pointer_x", [pointer;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|pointer_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_pointer_x" build_t the_module in
+          L.build_call build_func [| expr builder locals pointer|]
+            "get_pointer_x" builder
+      | SCall ("get_pointer_y", [pointer;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|pointer_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_pointer_y" build_t the_module in
+          L.build_call build_func [| expr builder locals pointer|]
+            "get_pointer_y" builder
+      | SCall ("set_pointer_color", [pointer;rgb]) ->
+        let build_t : L.lltype = 
+          L.function_type pointer_t [|pointer_t;rgb_t|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "set_pointer_color" build_t the_module in
+          L.build_call build_func [| expr builder locals pointer ; expr builder locals rgb |]
+            "set_pointer_xy" builder
+      | SCall ("get_canvas_x", [canvas;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|canvas_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_canvas_x" build_t the_module in
+          L.build_call build_func [| expr builder locals canvas|]
+            "get_canvas_x" builder
+      | SCall ("get_canvas_y", [canvas;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|canvas_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_canvas_y" build_t the_module in
+          L.build_call build_func [| expr builder locals canvas|]
+            "get_canvas_y" builder
+      | SCall ("sine", [angle;]) ->
+        let angle' = expr builder locals angle in
+        L.build_call sinecons_fun [| angle';|]
+            "sine" builder
+      | SCall ("cosine", [angle;]) ->
+        let angle' = expr builder locals angle in
+        L.build_call cosinecons_fun [| angle';|]
+            "cosine" builder
+      | SCall ("tangeant", [angle;]) ->
+        let angle' = expr builder locals angle in
+        L.build_call tangeantcons_fun [| angle';|]
+            "tangeant" builder
+      | SCall ("mod", [val1; val2;]) ->
+        let val1' = expr builder locals val1 
+        and val2' = expr builder locals val2 in
+        L.build_call modcons_fun [|val1';val2'|]
+            "mod" builder
+      | SCall ("floors", [val1;]) ->
+        let val1' = expr builder locals val1 in
+        L.build_call floorscons_fun [|val1';|]
+            "floors" builder
+      | SCall ("getRise", [distance;angle;]) ->
+        let distance' = expr builder locals distance 
+        and angle' = expr builder locals angle in
+        L.build_call getRisecons_fun [|distance';angle';|]
+            "getRise" builder
+      | SCall ("getRun", [distance;angle;]) ->
+        let distance' = expr builder locals distance 
+        and angle' = expr builder locals angle in
+        L.build_call getRuncons_fun [|distance';angle';|]
+            "getRun" builder
       | SCall (fname, args) ->
         let (ldev, sfd) = StringMap.find fname function_decls in
         let actuals = List.rev (List.map (fun e -> expr builder locals e)

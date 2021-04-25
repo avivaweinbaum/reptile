@@ -1,0 +1,5 @@
+int main() { 
+    Canvas can = Canvas(800, 800); 
+    save(can, "myfile.png"); 
+    return 0;
+}

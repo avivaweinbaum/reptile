@@ -1,0 +1,171 @@
+int xcur;
+int ycur;
+
+
+int tortup(Canvas can, Rgb color, int distance) {
+    int counter = 0;
+    while(counter < distance) {
+        pixel(can, color, xcur, ycur-counter);
+        counter = counter + 1;
+    }
+    ycur = ycur - distance;
+    return 0;
+}
+
+int tortdown(Canvas can, Rgb color, int distance) {
+    int counter = 0;
+    while(counter < distance) {
+        pixel(can, color, xcur, ycur+counter);
+        counter = counter + 1;
+    }
+    ycur = ycur + distance;
+    return 0;
+}
+
+int tortright(Canvas can, Rgb color, int distance) {
+    int counter = 0;
+    while(counter < distance) {
+        pixel(can, color, xcur+counter, ycur);
+        counter = counter + 1;
+    }
+    xcur = xcur + distance;
+    return 0;
+}
+
+int tortleft(Canvas can, Rgb color, int distance) {
+    int counter = 0;
+    while(counter < distance) {
+        pixel(can, color, xcur-counter, ycur);
+        counter = counter + 1;
+    }
+    xcur = xcur - distance;
+    return 0;
+}
+
+int tortNW(Canvas can, Rgb color, float distance) {
+    int counter = 0;
+    float counter1 = 0.0;
+    float step = distance * 0.707;
+    while(counter1 < step) {
+        pixel(can, color, xcur-counter, ycur-counter);
+        counter1 = counter1 + 1.0;
+        counter = counter + 1;
+    }
+    xcur = xcur - counter;
+    ycur = ycur - counter;
+    return 0;
+}
+
+int tortNE(Canvas can, Rgb color, float distance) {
+    int counter = 0;
+    float counter1 = 0.0;
+    float step = distance * 0.707;
+    while(counter1 < step) {
+        pixel(can, color, xcur+counter, ycur-counter);
+        counter1 = counter1 + 1.0;
+        counter = counter + 1;
+    }
+    xcur = xcur + counter;
+    ycur = ycur - counter;
+    return 0;
+}
+
+int tortSW(Canvas can, Rgb color, float distance) {
+    int counter = 0;
+    float counter1 = 0.0;
+    float step = distance * 0.707;
+    while(counter1 < step) {
+        pixel(can, color, xcur-counter, ycur+counter);
+        counter1 = counter1 + 1.0;
+        counter = counter + 1;
+    }
+    xcur = xcur - counter;
+    ycur = ycur + counter;
+    return 0;
+}
+
+int tortSE(Canvas can, Rgb color, float distance) {
+    int counter = 0;
+    float counter1 = 0.0;
+    float step = distance * 0.707;
+    while(counter1 < step) {
+        pixel(can, color, xcur+counter, ycur+counter);
+        counter1 = counter1 + 1.0;
+        counter = counter + 1;
+    }
+    xcur = xcur + counter;
+    ycur = ycur + counter;
+    return 0;
+}
+
+int movetort(int x, int y) {
+    xcur = x;
+    ycur = y;
+    return 0;
+}
+
+int main() {
+    Canvas can = Canvas(600, 600);
+    Rgb color = Rgb(56,137,190);
+    Rgb roofcolor = Rgb(255,0,0);
+    movetort(200, 200);
+    tortright(can, roofcolor,200);
+    tortdown(can, color, 200);
+    tortleft(can, color, 200);
+    tortup(can, color, 200);
+    
+    movetort(200, 200);
+    tortNE(can, roofcolor, 141.0);
+    tortSE(can, roofcolor, 141.0);
+
+    Rgb window = Rgb(201, 52, 235);
+    movetort(220,220);
+    tortright(can, window, 30);
+    tortdown(can, window, 30);
+    tortleft(can, window, 30);
+    tortup(can, window, 30);
+    movetort(235,220);
+    tortdown(can, window, 30);
+    movetort(220, 235);
+    tortright(can, window, 30);
+
+    Rgb win = Rgb(235, 149, 52);
+    movetort(270, 260);
+    tortright(can, win, 60);
+    tortdown(can, win, 60);
+    tortleft(can, win, 60);
+    tortup(can, win, 60);
+    movetort(300,260);
+    tortdown(can, win, 60);
+    movetort(270, 290);
+    tortright(can, win, 60);
+
+    Rgb chimney = Rgb(97,51,1);
+    movetort(350, 150);
+    tortup(can, chimney, 100);
+    tortright(can, chimney, 35);
+    tortdown(can, chimney, 135);
+
+    Rgb door = Rgb(114, 40, 143);
+    movetort(320, 400);
+    tortup(can, door, 60);
+    tortright(can, door, 60);
+    tortdown(can, door, 60);
+    movetort(350, 400);
+    tortup(can, door, 60);
+
+    movetort(340, 370);
+    tortright(can, door, 6);
+    tortdown(can, door, 6);
+    tortleft(can, door, 6);
+    tortup(can, door, 6);
+
+    movetort(354, 370);
+    tortright(can, door, 6);
+    tortdown(can, door, 6);
+    tortleft(can, door, 6);
+    tortup(can, door, 6);
+
+    save(can, "simple_turtle_start.png");
+    return 0;
+}
