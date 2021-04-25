@@ -29,7 +29,9 @@ int mod(int val1, int val2) {
 }
 
 int floors(float val1) {
-    return (int) val1;
+    int my_int;
+    my_int = (int)val1;
+    return my_int;
 }
 
 int getRise(int distance, double angle) {

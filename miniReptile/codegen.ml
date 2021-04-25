@@ -48,21 +48,6 @@ let translate (globals, functions) =
   let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
 
-  (* let rgbcons_t : L.lltype =
-      L.function_type rgb_t [| i32_t ; i32_t; i32_t |] in
-  let rgbcons_fun : L.llvalue =
-      L.declare_function "Rgb" rgbcons_t the_module in *)
-
-  let getR_rgb_cons_t : L.lltype =
-      L.function_type i32_t [| rgb_t;|] in
-  let getR_rgb_cons_fun : L.llvalue =
-      L.declare_function "getR_rgb" getR_rgb_cons_t the_module in
-
-  let setR_rgb_cons_t : L.lltype =
-      L.function_type rgb_t [| rgb_t; i32_t;|] in
-  let setR_rgb_cons_fun : L.llvalue =
-      L.declare_function "setR_rgb" setR_rgb_cons_t the_module in
-
   let ptrcons_t : L.lltype =
       L.function_type pointer_t [| i32_t ; i32_t ; rgb_t ; float_t |] in
   let ptrcons_fun : L.llvalue =
@@ -72,11 +57,6 @@ let translate (globals, functions) =
       L.function_type canvas_t  [| i32_t ; i32_t |]  in
   let canvascons_fun : L.llvalue =
       L.declare_function "Canvas" canvascons_t the_module in
-
-  (* let createcons_t : L.lltype =
-      L.function_type i32_t  [| canvas_t |] in
-  let createcons_fun : L.llvalue =
-      L.declare_function "create" createcons_t the_module in *)
 
   let savecons_t : L.lltype =
       L.function_type i32_t  [| canvas_t ; string_t |] in
@@ -140,8 +120,6 @@ let translate (globals, functions) =
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
-    (* and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder *)
-    (* and str_format_str = L.build_global_stringptr "%s\n" "fmt" builder in *)
 
     let local_vars =
       let add_formal m (t, n) p =
@@ -156,13 +134,6 @@ let translate (globals, functions) =
     let lookup n locals = try StringMap.find n locals
                    with Not_found -> StringMap.find n global_vars
     in
-
-    let mem_to_ind ty = match ty  with
-    _ -> List.fold_left (fun m (name, ind) -> StringMap.add name ind m)
-                StringMap.empty [("r",0); ("g",1); ("b",2); ("x",0); ("y",1); 
-                ("color",2); ("angle",3); ("canvas",1)]
-    in
-
 
     (* Construct code for an expression; return its value *)
     let rec expr builder locals ((_, e) : sexpr) = match e with
@@ -207,7 +178,6 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_icmp L.Icmp.Sle
         | A.Greater -> L.build_icmp L.Icmp.Sgt
         | A.Geq     -> L.build_icmp L.Icmp.Sge
-        (* | _         -> raise (Failure ("illegal binop")) *)
         ) e1' e2' "tmp" builder
       | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder locals e in
@@ -230,7 +200,8 @@ let translate (globals, functions) =
             L.function_type rgb_t [|i32_t; i32_t; i32_t;|] in 
               let build_func : L.llvalue = 
                 L.declare_function "Rgb" build_t the_module in
-          L.build_call build_func [| expr builder locals r; expr builder locals g; expr builder locals b; |]
+          L.build_call build_func [| expr builder locals r; 
+                expr builder locals g; expr builder locals b; |]
               "Rgb" builder
       | SCall("Pointer", [x;y;color;angle]) ->
           let x' = expr builder locals x
@@ -260,15 +231,69 @@ let translate (globals, functions) =
         and y' = expr builder locals y in
         L.build_call pixelcons_fun [| can';color';x';y' |]
             "pixel" builder
-      | SCall("getR_rgb", [rgb;]) ->
-        let rgb' = expr builder locals rgb in
-        L.build_call getR_rgb_cons_fun [| rgb' |]
-            "getR_rgb" builder
-      | SCall("setR_rgb", [rgb; r_new]) ->
-        let rgb' = expr builder locals rgb 
-        and r_new' = expr builder locals r_new in
-        L.build_call setR_rgb_cons_fun [| rgb'; r_new' |]
-            "setR_rgb" builder
+      | SCall ("get_rgb_r", [rgb;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|rgb_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_rgb_r" build_t the_module in
+          L.build_call build_func [| expr builder locals rgb|]
+            "get_rgb_r" builder
+      | SCall ("get_rgb_g", [rgb;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|rgb_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_rgb_g" build_t the_module in
+          L.build_call build_func [| expr builder locals rgb|]
+            "get_rgb_g" builder
+      | SCall ("get_rgb_b", [rgb;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|rgb_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_rgb_b" build_t the_module in
+          L.build_call build_func [| expr builder locals rgb|]
+            "get_rgb_b" builder
+      | SCall ("get_pointer_x", [pointer;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|pointer_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_pointer_x" build_t the_module in
+          L.build_call build_func [| expr builder locals pointer|]
+            "get_pointer_x" builder
+      | SCall ("get_pointer_y", [pointer;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|pointer_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_pointer_y" build_t the_module in
+          L.build_call build_func [| expr builder locals pointer|]
+            "get_pointer_y" builder
+      (* | SCall ("set_pointer_xy", [pointer;x;y]) ->
+        let build_t : L.lltype = 
+          L.function_type pointer_t [|pointer_t;i32_t;i32_t|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "set_pointer_xy" build_t the_module in
+          L.build_call build_func [| expr builder locals pointer ; expr builder locals x ; expr builder locals y|]
+            "set_pointer_xy" builder *)
+      | SCall ("set_pointer_color", [pointer;rgb]) ->
+        let build_t : L.lltype = 
+          L.function_type pointer_t [|pointer_t;rgb_t|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "set_pointer_color" build_t the_module in
+          L.build_call build_func [| expr builder locals pointer ; expr builder locals rgb |]
+            "set_pointer_xy" builder
+      | SCall ("get_canvas_x", [canvas;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|canvas_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_canvas_x" build_t the_module in
+          L.build_call build_func [| expr builder locals canvas|]
+            "get_canvas_x" builder
+      | SCall ("get_canvas_y", [canvas;]) ->
+        let build_t : L.lltype = 
+          L.function_type i32_t [|canvas_t;|] in 
+            let build_func : L.llvalue = 
+              L.declare_function "get_canvas_y" build_t the_module in
+          L.build_call build_func [| expr builder locals canvas|]
+            "get_canvas_y" builder
       | SCall ("sine", [angle;]) ->
         let angle' = expr builder locals angle in
         L.build_call sinecons_fun [| angle';|]
@@ -308,23 +333,6 @@ let translate (globals, functions) =
             A.Void -> ""
           | _-> fname^"_ret") in
         L.build_call ldev (Array.of_list actuals) ret builder
-      | SAccess(id,sx) ->
-          let getI t n = 
-            try StringMap.find n (mem_to_ind t) 
-            with Not_found -> raise(Failure("member not found"))in
-          let getNextVal o t n = L.build_struct_gep o (getI t n) n builder in
-          let rec eval out t = function
-              SAccess(sid, sf)-> eval (getNextVal out t sid) 
-                  (L.type_of(getNextVal out t sid)) (snd sf)  
-            | SId sid -> 
-                    let ref = L.build_struct_gep out (getI t sid) sid builder in
-                    L.build_load ref sid builder
-            | SAssign(s,e) -> 
-                  let ref = L.build_struct_gep out (getI t s) s builder in
-                  let e' =  expr builder locals e in
-                  ignore(L.build_store e' ref builder); e'
-            | _ -> raise(Failure("invalid field usage"))
-          in eval (lookup id locals) (L.type_of (lookup id locals)) (snd sx)
     in
 
  (* LLVM insists each basic block end with exactly one "terminator"

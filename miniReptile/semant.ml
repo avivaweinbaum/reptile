@@ -45,8 +45,14 @@ let check (globals, functions) =
       ("create", Void, [(Canvas, "canvas")]);
       ("save", Void, [(Canvas, "can"); (String, "filename")]); 
       ("pixel", Canvas, [(Canvas, "can"); (Rgb, "color"); (Int, "x"); (Int, "y")]);
-      ("getR_rgb", Int, [(Rgb, "rgb");]);
-      ("setR_rgb", Rgb, [(Rgb, "rgb"); (Int, "r_new");]);
+      ("get_rgb_r", Int, [(Rgb, "rgb");]);
+      ("get_rgb_g", Int, [(Rgb, "rgb");]);
+      ("get_rgb_b", Int, [(Rgb, "rgb");]);
+      ("get_pointer_x", Int, [(Pointer, "pointer")]);
+      ("get_pointer_y", Int, [(Pointer, "pointer")]);
+      ("set_pointer_color", Pointer, [(Pointer, "pointer"); (Rgb, "rgb")]);
+      ("get_canvas_x", Int, [(Canvas, "canvas")]);
+      ("get_canvas_y", Int, [(Canvas, "canvas")]);
       ("sine", Float, [(Float, "angle");]);
       ("cosine", Float, [(Float, "angle");]);
       ("tangeant", Float, [(Float, "angle");]);
@@ -102,16 +108,6 @@ let check (globals, functions) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
-    let member_map_of_type ty = match ty with
-        Rgb -> List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
-            StringMap.empty [(Int, "r"); (Int, "g"); (Int, "b")]
-      | Pointer -> List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
-            StringMap.empty [(Int, "x"); (Int, "y"); (Rgb, "color"); (Float, "angle")]
-      | Canvas -> List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
-            StringMap.empty [(Int, "x"); (Int, "y")]
-      | _ -> raise (Failure ("type " ^ string_of_typ ty ^ " does not have members"))
-    in
-
     (* Return a semantically-checked expression, i.e., with a type *)
     let rec expr locals = function
         Literal  l -> (Int, SLiteral l)
@@ -135,10 +131,10 @@ let check (globals, functions) =
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div when t1 = Float || t2 = Float -> Float
+          | Add | Sub | Mul | Div when same && t1 = Float -> Float
           | Equal | Neq            when same               -> Bool
           | Less | Leq | Greater | Geq
-                     when same && (t1 = Int) -> Bool
+                     when same && ((t1 = Int) || (t1 = Float)) -> Bool
           | And | Or when same && t1 = Bool -> Bool
           | _ -> raise (
 	      Failure ("illegal binary operator "))
@@ -162,32 +158,6 @@ let check (globals, functions) =
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
           in (check_assign lt rt err, SAssign(var, (rt, e')))
-      | Access(id, ex) ->
-          let ty = type_of_identifier locals id in
-          let map = member_map_of_type ty in
-          let smem = match ex with
-              Assign(v,e) as exp-> 
-                   let ty = type_of_identifier map v in
-                      (match e with
-                        Fliteral _ -> 
-                            let lt = StringMap.find v map
-                            and (rt, e') = expr locals e in
-                            let err = "illegal assignment of object field" ^ 
-                                string_of_typ lt ^ " = " ^ 
-                                string_of_typ rt ^ " in " ^ 
-                                string_of_expr exp ^ " for identifier Field." ^ v
-                            in (check_assign lt rt err, SAssign(v, (rt, e')))
-                        | Id s ->  (ty,SAssign(v,(ty, SId s)) ) 
-                        | _ -> raise (Failure ("illegal member access - "
-                                  ^ " expression type is not a field"))) 
-              | _ -> expr map ex 
-            in
-          (fst smem, SAccess(id, smem))
-
-
-      (* | ListAccess(lst, idx)
-
-      | ListLit *)
     in
 
     let check_bool_expr locals e = 
