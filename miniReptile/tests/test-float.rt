@@ -1,8 +1,0 @@
-float f(float x) { 
-    return x; 
-}
-int main() { 
-    print(5); 
-    f(5.5); 
-    return 0; 
-}

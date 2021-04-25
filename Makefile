@@ -8,7 +8,7 @@ test : all testall.sh
 # to test linking external code
 
 .PHONY : all
-all : reptile.native rgb # printbig.o
+all : reptile.native rgb canvas pointer png pixelator trig# printbig.o
 
 # "make reptile.native" compiles the compiler
 #
@@ -26,7 +26,7 @@ reptile.native :
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff
+	rm -rf testall.log ocamlllvm *.diff *.o
 
 # Testing the "printbig" example
 
@@ -34,20 +34,33 @@ clean :
 #	cc -o printbig -DBUILD_TEST printbig.c
 
 rgb : rgb.c
-	gcc -c rgb.c
+	gcc -c rgb.c -lm
+
+canvas: canvas.c
+	gcc -c canvas.c -lm
+
+pointer: pointer.c
+	gcc -c pointer.c -lm
+
+png: png.c
+	gcc -c png.c -lm
+
+pixelator: pixelator.c
+	gcc -c pixelator.c -lm
+
+trig: trig.c
+	gcc -c trig.c -lm
+
 # Building the tarball
 
 TESTS = \
 	helloworld float void assign arithmetic if if2 if3 if4 if5 if6 \
-	else
+	else string comments create_save fib field pixel pointer rgb \
+	while and or not canvas
 
 FAILS = \
-	helloworld float if dead expr func func2 func3 func4 func5 func6 \
-	func7 global if2 nomain return
- # assign1 assign2 assign3 dead1 dead2 expr1 expr2 expr3 float1 float2 \
- # for1 for2 for3 for4 for5 func1 func2 func3 func4 func5 func6 func7 \
- # func8 func9 global1 global2 if1 if2 if3 nomain printbig printb print \
- # return1 return2 while1 while2
+	helloworld float if dead dead2 func func2 func3 func4 func5 func6 \
+	func7 expr global if2 nomain return
 
 TESTFILES = $(TESTS:%=test-%.rt) $(TESTS:%=test-%.out) \
 	    $(FAILS:%=fail-%.rt) $(FAILS:%=fail-%.err)

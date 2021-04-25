@@ -40,9 +40,27 @@ let check (globals, functions) =
       body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("print", Void, [(Int, "x")]);
       ("Rgb", Rgb, [(Int, "r"); (Int, "g"); (Int, "b")]);
-      ("Pointer", Pointer, [(Float, "x"); (Float, "y"); (Rgb, "color"); (Float, "angle")]);
-      ("Canvas", Canvas, [(Float, "x"); (Float, "y")]);
-      ("File", File, [(String, "filename"); (Canvas, "canvas")]); ]
+      ("Pointer", Pointer, [(Int, "x"); (Int, "y"); (Rgb, "color"); (Float, "angle")]);
+      ("Canvas", Canvas, [(Int, "x"); (Int, "y")]);
+      ("create", Void, [(Canvas, "canvas")]);
+      ("save", Void, [(Canvas, "can"); (String, "filename")]); 
+      ("pixel", Canvas, [(Canvas, "can"); (Rgb, "color"); (Int, "x"); (Int, "y")]);
+      ("get_rgb_r", Int, [(Rgb, "rgb");]);
+      ("get_rgb_g", Int, [(Rgb, "rgb");]);
+      ("get_rgb_b", Int, [(Rgb, "rgb");]);
+      ("get_pointer_x", Int, [(Pointer, "pointer")]);
+      ("get_pointer_y", Int, [(Pointer, "pointer")]);
+      ("set_pointer_color", Pointer, [(Pointer, "pointer"); (Rgb, "rgb")]);
+      ("get_canvas_x", Int, [(Canvas, "canvas")]);
+      ("get_canvas_y", Int, [(Canvas, "canvas")]);
+      ("sine", Float, [(Float, "angle");]);
+      ("cosine", Float, [(Float, "angle");]);
+      ("tangeant", Float, [(Float, "angle");]);
+      ("mod", Int, [(Int, "val1"); (Int, "val2");]);
+      ("floors", Int, [(Float, "val");]);
+      ("getRise", Int, [(Int, "distance"); (Float, "angle");]);
+      ("getRun", Int, [(Int, "distance"); (Float, "angle");])
+      ];
   in
 
   (* Add function name to symbol table *)
@@ -75,7 +93,6 @@ let check (globals, functions) =
 
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
-    (* **********DIFFERENT************* *)
     let check_assign lvaluet rvaluet err =
        if lvaluet = rvaluet then lvaluet else raise (Failure err)
     in   
@@ -95,16 +112,18 @@ let check (globals, functions) =
     let rec expr locals = function
         Literal  l -> (Int, SLiteral l)
       | Fliteral f -> (Float, SFliteral f)
+      | Sliteral s -> (String, SSliteral s)
+      | BoolLit  l -> (Bool, SBoolLit l)
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier locals s, SId s)
-      (* | Unop(op, e) as ex -> 
-          let (t, e') = expr e in
+      | Unop(op, e) -> 
+          let (t, e') = expr locals e in
           let ty = match op with
             Neg when t = Int -> t
           | Not when t = Bool -> Bool
           | _ -> raise (Failure ("illegal unary operator"))
-          in (ty, SUnop(op, (t, e'))) *)
-      | Binop(e1, op, e2) as e -> 
+          in (ty, SUnop(op, (t, e')))
+      | Binop(e1, op, e2) -> 
           let (t1, e1') = expr locals e1 
           and (t2, e2') = expr locals e2 in
           (* All binary operators require operands of the same type *)
@@ -112,21 +131,23 @@ let check (globals, functions) =
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div when same && t1 = Float -> Float
           | Equal | Neq            when same               -> Bool
           | Less | Leq | Greater | Geq
-                     when same && (t1 = Int) -> Bool
+                     when same && ((t1 = Int) || (t1 = Float)) -> Bool
           | And | Or when same && t1 = Bool -> Bool
           | _ -> raise (
 	      Failure ("illegal binary operator "))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
-      | Call(fname, args) as call -> 
+      | Call(fname, args) -> 
           let fd = find_func fname in
           let param_length = List.length fd.formals in
           if List.length args != param_length then
             raise (Failure ("calling failure"))
           else let check_call (ft, _) e = 
             let (et, e') = expr locals e in 
-            let err = "illegal argument found"
+            let err = "illegal argument found" ^ string_of_typ et ^
+              " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e
             in (check_assign ft et err, e')
           in 
           let args' = List.map2 check_call fd.formals args
@@ -137,9 +158,6 @@ let check (globals, functions) =
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
           in (check_assign lt rt err, SAssign(var, (rt, e')))
-      (* | ListAccess(lst, idx)
-
-      | ListLit *)
     in
 
     let check_bool_expr locals e = 

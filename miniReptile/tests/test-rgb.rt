@@ -1,4 +1,0 @@
-int main() { 
-    Rgb color = Rgb(1,2,3); 
-    return 0; 
-}

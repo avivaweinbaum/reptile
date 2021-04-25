@@ -1,4 +1,0 @@
-int main() {
-    print(30+3);
-    return 0;
-}

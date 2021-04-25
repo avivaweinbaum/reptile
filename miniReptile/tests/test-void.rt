@@ -1,7 +1,0 @@
-void p(int a) { 
-    print(a); 
-}
-int main() { 
-    p(3); 
-    return 0; 
-}
