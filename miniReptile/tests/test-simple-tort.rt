@@ -101,7 +101,7 @@ int tortSE(Canvas can, Rgb color, float distance) {
 
 int main() {
     Canvas can = Canvas(500, 500);
-    Rgb color = Rgb(0,0,0);
+    Rgb color = Rgb(56,137,190);
     xcur = 100;
     ycur = 100;
     tortright(can, color, 100);

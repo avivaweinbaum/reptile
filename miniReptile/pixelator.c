@@ -14,7 +14,7 @@
 
 struct canvas* pixel(struct canvas* can, struct rgb* color, int x, int y) {
 
-    libattopng_set_pixel(can->png, x, y, RGBA(0 & 255, 0 & 255, 0, (255 )));
+    libattopng_set_pixel(can->png, x, y, RGBA(get_rgb_r(color) & 255, get_rgb_g(color) & 255, get_rgb_b(color) & 255, (255 )));
     return can;
 }
 
