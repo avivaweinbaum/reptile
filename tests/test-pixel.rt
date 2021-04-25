@@ -1,6 +1,6 @@
 int main() { 
     Canvas can = Canvas(400, 400);
-    Rgb color = Rgb(0,0,0); 
+    Rgb color = Rgb(255,0,0); 
     pixel(can, color, 200, 200);
     pixel(can, color, 201, 200);
     pixel(can, color, 202, 200);

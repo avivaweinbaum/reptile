@@ -1,3 +1,6 @@
+(* LLVM code generation for Reptile *)
+(* Aviva Weinbaum, Lindsey Weiskopf, Hariti Patel, Aileen Cano *)
+
 module L = Llvm
 module A = Ast
 open Sast
@@ -78,10 +81,10 @@ let translate (globals, functions) =
   let cosinecons_fun : L.llvalue = 
       L.declare_function "cosine" cosinecons_t the_module in
 
-  let tangeantcons_t : L.lltype = 
+  let tangentcons_t : L.lltype = 
       L.function_type float_t [|float_t;|] in
-  let tangeantcons_fun : L.llvalue = 
-      L.declare_function "tangeant" tangeantcons_t the_module in
+  let tangentcons_fun : L.llvalue = 
+      L.declare_function "tangent" tangentcons_t the_module in
 
   let modcons_t : L.lltype =
       L.function_type i32_t [|i32_t; i32_t;|] in
@@ -285,10 +288,10 @@ let translate (globals, functions) =
         let angle' = expr builder locals angle in
         L.build_call cosinecons_fun [| angle';|]
             "cosine" builder
-      | SCall ("tangeant", [angle;]) ->
+      | SCall ("tangent", [angle;]) ->
         let angle' = expr builder locals angle in
-        L.build_call tangeantcons_fun [| angle';|]
-            "tangeant" builder
+        L.build_call tangentcons_fun [| angle';|]
+            "tangent" builder
       | SCall ("mod", [val1; val2;]) ->
         let val1' = expr builder locals val1 
         and val2' = expr builder locals val2 in

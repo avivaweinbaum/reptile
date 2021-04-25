@@ -1,4 +1,5 @@
-(* Semantic checking for the MicroC compiler *)
+(* Semantic checking for the Reptile compiler *)
+(* Aviva Weinbaum, Lindsey Weiskopf, Hariti Patel, Aileen Cano *)
 
 open Ast
 open Sast
@@ -39,7 +40,6 @@ let check (globals, functions) =
       ("Rgb", Rgb, [(Int, "r"); (Int, "g"); (Int, "b")]);
       ("Pointer", Pointer, [(Int, "x"); (Int, "y"); (Rgb, "color"); (Float, "angle")]);
       ("Canvas", Canvas, [(Int, "x"); (Int, "y")]);
-      ("create", Void, [(Canvas, "canvas")]);
       ("save", Void, [(Canvas, "can"); (String, "filename")]); 
       ("pixel", Canvas, [(Canvas, "can"); (Rgb, "color"); (Int, "x"); (Int, "y")]);
       ("get_rgb_r", Int, [(Rgb, "rgb");]);
@@ -52,7 +52,7 @@ let check (globals, functions) =
       ("get_canvas_y", Int, [(Canvas, "canvas")]);
       ("sine", Float, [(Float, "angle");]);
       ("cosine", Float, [(Float, "angle");]);
-      ("tangeant", Float, [(Float, "angle");]);
+      ("tangent", Float, [(Float, "angle");]);
       ("mod", Int, [(Int, "val1"); (Int, "val2");]);
       ("floors", Int, [(Float, "val");]);
       ("getRise", Int, [(Int, "distance"); (Float, "angle");]);

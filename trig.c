@@ -18,7 +18,7 @@ double cosine(double angle) {
     return cosval;
 }
 
-double tangeant(double angle) {
+double tangant(double angle) {
     double val = PI / 180.0;
     double tanval = tanh(angle*val);
     return tanval;

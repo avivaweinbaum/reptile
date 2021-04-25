@@ -8,7 +8,7 @@
 
 double sine(double angle);
 double cosine(double angle);
-double tangeant(double angle);
+double tangent(double angle);
 int mod(int val1, int val2); 
 int floors(float val1);
 int getRise(int distance, double angle);
