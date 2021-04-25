@@ -28,14 +28,6 @@ int get_pointer_y(struct pointer* pointer) {
     return pointer->y;
 }
 
-// struct pointer* set_pointer_xy(struct pointer* pointer, int x_new, int y_new) {
-//     pointer->x = x_new;
-//     pointer->y = y_new;
-//     return pointer;
-//     // struct rgb color = pointer->color;
-//     // return Pointer(x_new, y_new, color, pointer->angle);
-// }
-
 struct pointer* set_pointer_color(struct pointer* pointer, struct rgb* rgb) {
     return Pointer(pointer->x, pointer->y, rgb, pointer->angle);
 }
