@@ -1,5 +1,5 @@
 int main() { 
-    Canvas can = Canvas(300, 400)
+    Canvas can = Canvas(300, 400);
     Rgb color = Rgb(0,0,0);
     pixel(can, color,0, 0);
 pixel(can, color,0, 1);

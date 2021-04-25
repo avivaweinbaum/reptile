@@ -189,12 +189,6 @@ let translate (globals, functions) =
       | SCall ("print", [e]) ->
           L.build_call printf_func [| int_format_str ; (expr builder locals e) |]
           "printf" builder
-      (* | SCall("Rgb", [r;g;b]) ->
-          let r' = expr builder locals r
-          and g' = expr builder locals g
-          and b' = expr builder locals b in
-          L.build_call rgbcons_fun [| r' ; g' ; b' |]
-              "Rgb" builder *)
       | SCall ("Rgb", [r;g;b]) ->
           let build_t : L.lltype = 
             L.function_type rgb_t [|i32_t; i32_t; i32_t;|] in 
@@ -215,10 +209,6 @@ let translate (globals, functions) =
           and y' = expr builder locals y in
           L.build_call canvascons_fun [| x' ; y' |]
               "Canvas" builder
-      (* | SCall("create", [canvas]) ->
-          let canvas' = expr builder locals canvas in
-          L.build_call createcons_fun [| canvas' |]
-              "create" builder *)
       | SCall("save", [can;filename]) ->
           let can' = expr builder locals can
           and filename' = expr builder locals filename in
@@ -266,13 +256,6 @@ let translate (globals, functions) =
               L.declare_function "get_pointer_y" build_t the_module in
           L.build_call build_func [| expr builder locals pointer|]
             "get_pointer_y" builder
-      (* | SCall ("set_pointer_xy", [pointer;x;y]) ->
-        let build_t : L.lltype = 
-          L.function_type pointer_t [|pointer_t;i32_t;i32_t|] in 
-            let build_func : L.llvalue = 
-              L.declare_function "set_pointer_xy" build_t the_module in
-          L.build_call build_func [| expr builder locals pointer ; expr builder locals x ; expr builder locals y|]
-            "set_pointer_xy" builder *)
       | SCall ("set_pointer_color", [pointer;rgb]) ->
         let build_t : L.lltype = 
           L.function_type pointer_t [|pointer_t;rgb_t|] in 

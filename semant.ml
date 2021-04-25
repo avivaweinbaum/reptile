@@ -14,9 +14,6 @@ let check (globals, functions) =
 
   (* Verify a list of bindings has no void types or duplicate names *)
   let check_binds (kind : string) (binds : bind list) =
-    (* List.iter (function
-	(Void, b) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
-      | _ -> ()) binds; *)
     let rec dups = function
         [] -> ()
       |	((_,n1) :: (_,n2) :: _) when n1 = n2 ->
@@ -180,7 +177,6 @@ let check (globals, functions) =
           let rec check_stmt_list block_locals ssl = function
               [Return _ as s] -> [check_stmt block_locals s]
             | Return _ :: _   -> raise (Failure "nothing may follow a return")
-            (* | Block sl :: ss  -> check_stmt_list block_locals (sl @ ss) Flatten blocks *)
             | Block sl :: ss -> [check_stmt block_locals (Block sl)] 
                               @ (check_stmt_list block_locals ssl ss)
             | s :: ss ->
@@ -200,7 +196,6 @@ let check (globals, functions) =
                 let block_locals = StringMap.add name typ block_locals in
                   [check_stmt block_locals s] @ check_stmt_list block_locals ssl ss
               | _ -> [check_stmt block_locals s] @ check_stmt_list block_locals ssl ss)
-            (* | s :: ss         -> check_stmt locals s :: check_stmt_list block_locals ss *)
             | []              -> ssl
           in SBlock(check_stmt_list locals [] sl)
       | Var (ty,id) -> SVar(ty,id)

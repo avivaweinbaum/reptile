@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include "types.h"
 
-
 struct Pointer {
     int x;
     int y;
