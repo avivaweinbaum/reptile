@@ -71,6 +71,46 @@ let translate (globals, functions) =
   let pixelcons_fun : L.llvalue =
       L.declare_function "pixel" pixelcons_t the_module in
 
+  let getrgbr_t : L.lltype = 
+      L.function_type i32_t [| rgb_t |] in
+  let getrgbr_fun : L.llvalue =
+      L.declare_function "get_rgb_r" getrgbr_t the_module in
+
+  let getrgbg_t : L.lltype = 
+      L.function_type i32_t [| rgb_t |] in
+  let getrgbg_fun : L.llvalue =
+      L.declare_function "get_rgb_g" getrgbg_t the_module in
+      
+  let getrgbb_t : L.lltype = 
+      L.function_type i32_t [| rgb_t |] in
+  let getrgbb_fun : L.llvalue =
+      L.declare_function "get_rgb_b" getrgbb_t the_module in
+
+  let getptrx_t : L.lltype = 
+      L.function_type i32_t [| pointer_t |] in
+  let getptrx_fun : L.llvalue =
+      L.declare_function "get_pointer_x" getptrx_t the_module in
+
+  let getptry_t : L.lltype = 
+      L.function_type i32_t [| pointer_t |] in
+  let getptry_fun : L.llvalue =
+      L.declare_function "get_pointer_y" getptry_t the_module in
+
+  let setptrcolor_t : L.lltype = 
+      L.function_type pointer_t [| pointer_t; rgb_t |] in
+  let setptrcolor_fun : L.llvalue =
+      L.declare_function "set_pointer_color" setptrcolor_t the_module in
+
+  let getcanvasx_t : L.lltype = 
+      L.function_type i32_t [| canvas_t |] in
+  let getcanvasx_fun : L.llvalue =
+      L.declare_function "get_canvas_x" getcanvasx_t the_module in
+
+  let getcanvasy_t : L.lltype = 
+      L.function_type i32_t [| canvas_t |] in
+  let getcanvasy_fun : L.llvalue =
+      L.declare_function "get_canvas_y" getcanvasy_t the_module in
+
   let sinecons_t : L.lltype = 
       L.function_type float_t [|float_t;|] in
   let sinecons_fun : L.llvalue = 
@@ -225,61 +265,38 @@ let translate (globals, functions) =
         L.build_call pixelcons_fun [| can';color';x';y' |]
             "pixel" builder
       | SCall ("get_rgb_r", [rgb;]) ->
-        let build_t : L.lltype = 
-          L.function_type i32_t [|rgb_t;|] in 
-            let build_func : L.llvalue = 
-              L.declare_function "get_rgb_r" build_t the_module in
-          L.build_call build_func [| expr builder locals rgb|]
-            "get_rgb_r" builder
+        let rgb' = expr builder locals rgb in
+          L.build_call getrgbr_fun [| rgb' |]
+              "get_rgb_r" builder
       | SCall ("get_rgb_g", [rgb;]) ->
-        let build_t : L.lltype = 
-          L.function_type i32_t [|rgb_t;|] in 
-            let build_func : L.llvalue = 
-              L.declare_function "get_rgb_g" build_t the_module in
-          L.build_call build_func [| expr builder locals rgb|]
-            "get_rgb_g" builder
+        let rgb' = expr builder locals rgb in
+          L.build_call getrgbg_fun [| rgb' |]
+              "get_rgb_g" builder
       | SCall ("get_rgb_b", [rgb;]) ->
-        let build_t : L.lltype = 
-          L.function_type i32_t [|rgb_t;|] in 
-            let build_func : L.llvalue = 
-              L.declare_function "get_rgb_b" build_t the_module in
-          L.build_call build_func [| expr builder locals rgb|]
-            "get_rgb_b" builder
+        let rgb' = expr builder locals rgb in
+          L.build_call getrgbb_fun [| rgb' |]
+              "get_rgb_b" builder
       | SCall ("get_pointer_x", [pointer;]) ->
-        let build_t : L.lltype = 
-          L.function_type i32_t [|pointer_t;|] in 
-            let build_func : L.llvalue = 
-              L.declare_function "get_pointer_x" build_t the_module in
-          L.build_call build_func [| expr builder locals pointer|]
-            "get_pointer_x" builder
+        let pointer' = expr builder locals pointer in
+          L.build_call getptrx_fun [| pointer' |]
+              "get_pointer_x" builder
       | SCall ("get_pointer_y", [pointer;]) ->
-        let build_t : L.lltype = 
-          L.function_type i32_t [|pointer_t;|] in 
-            let build_func : L.llvalue = 
-              L.declare_function "get_pointer_y" build_t the_module in
-          L.build_call build_func [| expr builder locals pointer|]
-            "get_pointer_y" builder
+        let pointer' = expr builder locals pointer in
+          L.build_call getptry_fun [| pointer' |]
+              "get_pointer_y" builder
       | SCall ("set_pointer_color", [pointer;rgb]) ->
-        let build_t : L.lltype = 
-          L.function_type pointer_t [|pointer_t;rgb_t|] in 
-            let build_func : L.llvalue = 
-              L.declare_function "set_pointer_color" build_t the_module in
-          L.build_call build_func [| expr builder locals pointer ; expr builder locals rgb |]
-            "set_pointer_xy" builder
+        let pointer' = expr builder locals pointer 
+        and rgb' = expr builder locals rgb in
+          L.build_call setptrcolor_fun [| pointer';rgb' |]
+              "set_pointer_color" builder
       | SCall ("get_canvas_x", [canvas;]) ->
-        let build_t : L.lltype = 
-          L.function_type i32_t [|canvas_t;|] in 
-            let build_func : L.llvalue = 
-              L.declare_function "get_canvas_x" build_t the_module in
-          L.build_call build_func [| expr builder locals canvas|]
-            "get_canvas_x" builder
+        let canvas' = expr builder locals canvas in
+          L.build_call getcanvasx_fun [| canvas' |]
+              "get_canvas_x" builder
       | SCall ("get_canvas_y", [canvas;]) ->
-        let build_t : L.lltype = 
-          L.function_type i32_t [|canvas_t;|] in 
-            let build_func : L.llvalue = 
-              L.declare_function "get_canvas_y" build_t the_module in
-          L.build_call build_func [| expr builder locals canvas|]
-            "get_canvas_y" builder
+        let canvas' = expr builder locals canvas in
+          L.build_call getcanvasy_fun [| canvas' |]
+              "get_canvas_y" builder
       | SCall ("sine", [angle;]) ->
         let angle' = expr builder locals angle in
         L.build_call sinecons_fun [| angle';|]
